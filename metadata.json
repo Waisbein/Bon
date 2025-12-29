@@ -1,0 +1,7 @@
+{
+  "name": "Bon! Boulangerie • Pâtisserie",
+  "description": "Официальное мини-приложение кофейни Bon! Меню, филиалы и свежая выпечка всегда под рукой.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
