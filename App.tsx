@@ -14,6 +14,8 @@ declare global {
         ready: () => void;
         expand: () => void;
         close: () => void;
+        setHeaderColor: (color: string) => void;
+        setBackgroundColor: (color: string) => void;
         HapticFeedback: {
           impactOccurred: (style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void;
           notificationOccurred: (type: 'error' | 'success' | 'warning') => void;
@@ -34,6 +36,11 @@ const App: React.FC = () => {
     if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand(); // Разворачиваем на весь экран
+      
+      // Устанавливаем цвета интерфейса Telegram под цвет нашего приложения
+      // Это уберет резкую границу сверху
+      window.Telegram.WebApp.setHeaderColor('#faf9f6');
+      window.Telegram.WebApp.setBackgroundColor('#faf9f6');
     }
 
     const timer = setTimeout(() => {
