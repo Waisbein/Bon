@@ -17,17 +17,17 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({ lang }) => {
 
   return (
     <div className="p-4 animate-fadeIn pb-24">
-      <h2 className="text-2xl font-serif text-[#9a644d] mb-6">{t.title}</h2>
+      <h2 className="text-2xl font-serif text-[#9a644d] dark:text-[#b8866b] mb-6">{t.title}</h2>
       <div className="space-y-4">
         {BRANCHES.map((branch) => (
-          <div key={branch.id} className="bg-white p-5 rounded-2xl shadow-sm border border-[#9a644d]/10">
+          <div key={branch.id} className="bg-white dark:bg-[#1c1c1c] p-5 rounded-2xl shadow-sm border border-[#9a644d]/10 dark:border-white/10">
             <div className="flex justify-between items-start mb-2">
-              <h3 className="font-bold text-lg text-[#2d2d2d]">{branch.name[lang]}</h3>
-              <div className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">
+              <h3 className="font-bold text-lg text-[#2d2d2d] dark:text-[#f0f0f0]">{branch.name[lang]}</h3>
+              <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">
                 {t.open}
               </div>
             </div>
-            <div className="space-y-2 text-sm text-gray-600">
+            <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
@@ -50,10 +50,10 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({ lang }) => {
               </div>
             </div>
             <div className="mt-4 flex gap-2">
-              <button className="flex-1 bg-[#9a644d] text-white py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity">
+              <button className="flex-1 bg-[#9a644d] dark:bg-[#b8866b] text-white py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity">
                 {t.call}
               </button>
-              <button className="flex-1 border border-[#9a644d] text-[#9a644d] py-2 rounded-xl text-sm font-semibold hover:bg-[#9a644d]/5 transition-colors">
+              <button className="flex-1 border border-[#9a644d] dark:border-[#b8866b] text-[#9a644d] dark:text-[#b8866b] py-2 rounded-xl text-sm font-semibold hover:bg-[#9a644d]/5 transition-colors">
                 {t.map}
               </button>
             </div>
