@@ -46,56 +46,51 @@ const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('ru');
   const [isDark, setIsDark] = useState(false);
 
-  // ФУНКЦИЯ ОТПРАВКИ В GOOGLE ТАБЛИЦЫ
-  const logToGoogleSheets = async (userData: any) => {
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBGC7VWzrGwEEAZAz2wM0dx4ELe4ejc7ye_m1Ruu_X9R8bik-LJVv2pDweQDEGyfuJXg/exec';
+  // ФУНКЦИЯ ЛОГИРОВАНИЯ В GOOGLE ТАБЛИЦЫ (ОБНОВЛЕННАЯ)
+  const logToGoogleSheets = (userData: any) => {
+    if (!userData) return;
+    const url = 'https://script.google.com/macros/s/AKfycbzBGC7VWzrGwEEAZAz2wM0dx4ELe4ejc7ye_m1Ruu_X9R8bik-LJVv2pDweQDEGyfuJXg/exec';
     
-    try {
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // Важно для работы с Google Scripts без настройки CORS на сервере
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...userData,
-          timestamp: new Date().toISOString(),
-          app_name: 'Bon! App'
-        }),
-      });
-      console.log('User data sent to Google Sheets');
-    } catch (error) {
-      console.error('Error sending to Google Sheets:', error);
-    }
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        ...userData,
+        timestamp: new Date().toISOString(),
+        source: 'Telegram Mini App'
+      })
+    });
   };
 
-  // ФУНКЦИЯ УВЕДОМЛЕНИЯ В ВАШ БОТ
-  const notifyAdminViaBot = async (userData: any) => {
-    const BOT_TOKEN = '8488822343:AAEUJqso4VJvTgy-Jq34HDi7PCciJ4LS5js'; 
-    const ADMIN_CHAT_ID = '467914417';
-
-    const message = `🔔 *Новый посетитель Bon! App*\n\n` +
-      `👤 Имя: ${userData.first_name} ${userData.last_name}\n` +
+  // ФУНКЦИЯ ОТПРАВКИ СТАТИСТИКИ В ТЕЛЕГРАМ БОТ
+  const sendUserStats = (userData: any) => {
+    const TOKEN = '8488822343:AAEUJqso4VvTgy-Jq34HDi7PCciJ4LS5js';
+    const CHAT_ID = '467914417';
+    
+    const message = `🔔 *Новый вход в Bon! App*\n\n` +
+      `👤 Имя: ${userData.first_name} ${userData.last_name || ''}\n` +
       `🆔 ID: \`${userData.id}\`\n` +
       `🔗 Username: ${userData.username !== 'no_username' ? '@' + userData.username : 'отсутствует'}\n` +
       `⏰ Время: ${new Date().toLocaleString('ru-RU')}`;
 
-    try {
-      await fetch(`https://api.telegram.org/bot${8488822343:AAEUJqso4VJvTgy-Jq34HDi7PCciJ4LS5js}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: 467914417,
-          text: message,
-          parse_mode: 'Markdown'
-        })
-      });
-    } catch (error) {
-      console.error('Ошибка при отправке уведомления боту:', error);
-    }
+    const params = new URLSearchParams();
+    params.append('chat_id', CHAT_ID);
+    params.append('text', message);
+    params.append('parse_mode', 'Markdown');
+
+    fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: params
+    }).then(() => {
+      console.log('📊 Статистика входа отправлена в Telegram');
+    }).catch(err => {
+      console.error('❌ Ошибка при отправке статистики:', err);
+    });
   };
 
-  const logUserEntry = () => {
+  const handleInitialEntry = () => {
     const tg = window.Telegram?.WebApp;
     if (tg?.initDataUnsafe?.user) {
       const user = tg.initDataUnsafe.user;
@@ -105,14 +100,12 @@ const App: React.FC = () => {
         last_name: user.last_name || '',
         username: user.username || 'no_username',
       };
-
-      // 1. Отправляем в Google Таблицы
+      
+      // Отправляем данные в обе системы
+      sendUserStats(userData);
       logToGoogleSheets(userData);
-      
-      // 2. Отправляем уведомление в бот
-      notifyAdminViaBot(userData);
-      
-      console.log('Logging user activity:', userData);
+    } else {
+      console.warn('⚠️ Данные пользователя недоступны (запуск вне Telegram)');
     }
   };
 
@@ -133,7 +126,9 @@ const App: React.FC = () => {
     if (tg) {
       tg.ready();
       tg.expand();
-      logUserEntry();
+      
+      handleInitialEntry();
+      
       applyTheme(tg.colorScheme === 'dark');
       tg.onEvent('themeChanged', () => applyTheme(tg.colorScheme === 'dark'));
     }
@@ -161,7 +156,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col max-w-lg mx-auto relative bg-[#faf9f6] dark:bg-[#121212] transition-colors duration-500">
-      {/* Тема */}
+      {/* Кнопка темы */}
       <div className="absolute top-4 left-4 z-50">
         <button onClick={() => applyTheme(!isDark)} className="p-2 rounded-full bg-white/50 dark:bg-black/30 backdrop-blur border border-[#9a644d]/10 text-[#9a644d] dark:text-[#b8866b] shadow-sm active:scale-90">
           {isDark ? (
@@ -172,7 +167,7 @@ const App: React.FC = () => {
         </button>
       </div>
 
-      {/* Языки */}
+      {/* Переключатель языков */}
       <div className="absolute top-4 right-4 z-50 flex bg-white/50 dark:bg-black/30 backdrop-blur rounded-full p-1 border border-[#9a644d]/10">
         <button onClick={() => { handleImpact(); setLang('ru'); }} className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${lang === 'ru' ? 'bg-[#9a644d] text-white' : 'text-[#9a644d] dark:text-[#b8866b] opacity-60'}`}>RU</button>
         <button onClick={() => { handleImpact(); setLang('uz'); }} className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${lang === 'uz' ? 'bg-[#9a644d] text-white' : 'text-[#9a644d] dark:text-[#b8866b] opacity-60'}`}>UZ</button>
