@@ -46,16 +46,33 @@ const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('ru');
   const [isDark, setIsDark] = useState(false);
 
+  // ФУНКЦИЯ ОТПРАВКИ В GOOGLE ТАБЛИЦЫ
+  const logToGoogleSheets = async (userData: any) => {
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBGC7VWzrGwEEAZAz2wM0dx4ELe4ejc7ye_m1Ruu_X9R8bik-LJVv2pDweQDEGyfuJXg/exec';
+    
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', // Важно для работы с Google Scripts без настройки CORS на сервере
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...userData,
+          timestamp: new Date().toISOString(),
+          app_name: 'Bon! App'
+        }),
+      });
+      console.log('User data sent to Google Sheets');
+    } catch (error) {
+      console.error('Error sending to Google Sheets:', error);
+    }
+  };
+
   // ФУНКЦИЯ УВЕДОМЛЕНИЯ В ВАШ БОТ
   const notifyAdminViaBot = async (userData: any) => {
-    // ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА ВАШИ
     const BOT_TOKEN = '8488822343:AAEUJqso4VJvTgy-Jq34HDi7PCciJ4LS5js'; 
     const ADMIN_CHAT_ID = '467914417';
-
-    if (BOT_TOKEN === '8488822343:AAEUJqso4VJvTgy-Jq34HDi7PCciJ4LS5js') {
-      console.warn('Логирование: Не забудьте указать BOT_TOKEN и ADMIN_CHAT_ID в App.tsx');
-      return;
-    }
 
     const message = `🔔 *Новый посетитель Bon! App*\n\n` +
       `👤 Имя: ${userData.first_name} ${userData.last_name}\n` +
@@ -64,7 +81,7 @@ const App: React.FC = () => {
       `⏰ Время: ${new Date().toLocaleString('ru-RU')}`;
 
     try {
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      await fetch(`https://api.telegram.org/bot${8488822343:AAEUJqso4VJvTgy-Jq34HDi7PCciJ4LS5js}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,11 +106,13 @@ const App: React.FC = () => {
         username: user.username || 'no_username',
       };
 
-      // Отправляем уведомление вам в бот
+      // 1. Отправляем в Google Таблицы
+      logToGoogleSheets(userData);
+      
+      // 2. Отправляем уведомление в бот
       notifyAdminViaBot(userData);
       
-      // Дублируем в консоль для отладки
-      console.log('App started by:', userData);
+      console.log('Logging user activity:', userData);
     }
   };
 
