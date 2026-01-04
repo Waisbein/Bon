@@ -6,9 +6,11 @@ export interface MenuItem {
   name: { ru: string; uz: string };
   description?: { ru: string; uz: string };
   longDescription?: { ru: string; uz: string }; // Состав или подробное описание
+  allergens?: { ru: string; uz: string }; // Аллергены
   volumes?: { [size: string]: string }; // Объемы (напр. Petit: 200мл)
   price: number | { [size: string]: number };
-  category: 'coffee' | 'bakery' | 'breakfast' | 'dessert';
+  category: 'coffee' | 'bakery' | 'breakfast' | 'dessert' | 'decaf' | 'news' | 'serving';
+  section?: string; // Поле для специфического именования раздела
   image: string;
 }
 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BRANCHES } from '../data/mockData';
+import { branches } from '../data/menu'; // Изменен путь и название
 import { Language, Branch } from '../types';
 
 interface BranchesDetailProps {
@@ -23,7 +23,6 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({ lang }) => {
 
   const openMap = (branch: Branch) => {
     handleImpact('medium');
-    // Используем текстовый поиск вместо координат для 100% точности попадания в точку
     const searchQuery = `${branch.name[lang]} ${branch.address[lang]}`;
     const url = `https://yandex.uz/maps/?text=${encodeURIComponent(searchQuery)}`;
     window.open(url, '_blank');
@@ -34,8 +33,9 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({ lang }) => {
     window.location.href = `tel:${phone.replace(/\s/g, '')}`;
   };
 
-  const tashkentBranches = BRANCHES.filter(b => b.id.startsWith('t'));
-  const regionalBranches = BRANCHES.filter(b => b.id.startsWith('r'));
+  // Используем branches вместо BRANCHES
+  const tashkentBranches = branches.filter(b => b.id.startsWith('t'));
+  const regionalBranches = branches.filter(b => b.id.startsWith('r'));
 
   const renderBranchCard = (branch: Branch) => (
     <div key={branch.id} className="bg-white dark:bg-[#1c1c1c] p-6 rounded-[1.5rem] shadow-md border border-[#9a644d]/20 dark:border-white/10 transition-colors">
@@ -88,7 +88,6 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({ lang }) => {
 
   return (
     <div className="p-4 animate-fadeIn pb-32 space-y-12">
-      {/* Секция Ташкент */}
       <section>
         <h2 className="text-2xl font-serif text-[#3d2721] dark:text-[#b8866b] mb-6 flex items-center gap-4 px-1">
           <span className="whitespace-nowrap font-bold uppercase tracking-wider">{t.tashkent}</span>
@@ -99,7 +98,6 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({ lang }) => {
         </div>
       </section>
 
-      {/* Секция Регионы */}
       <section>
         <h2 className="text-2xl font-serif text-[#3d2721] dark:text-[#b8866b] mb-6 flex items-center gap-4 px-1">
           <span className="whitespace-nowrap font-bold uppercase tracking-wider">{t.regions}</span>

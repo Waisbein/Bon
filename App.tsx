@@ -5,6 +5,7 @@ import { Logo } from './components/Logo';
 import { MenuDetail } from './components/MenuDetail';
 import { BranchesDetail } from './components/BranchesDetail';
 import { View, Language } from './types';
+import { menuItems } from './data/menu'; // Импорт данных меню
 
 declare global {
   interface Window {

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MENU_ITEMS } from '../data/mockData';
+import { menuItems } from '../data/menu'; // Изменен путь и название
 import { Language, MenuItem } from '../types';
 
 interface MenuDetailProps {
@@ -8,13 +8,15 @@ interface MenuDetailProps {
 }
 
 export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeCategory, setActiveCategory] = useState<string>('coffee');
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
   const t = {
     title: lang === 'ru' ? 'Наше Меню' : 'Bizning Menyu',
-    all: lang === 'ru' ? 'Все' : 'Hammasi',
+    serving: lang === 'ru' ? 'Новая подача' : 'Yangi tortiq',
+    news: lang === 'ru' ? 'Новинки' : 'Yangiliklar',
     coffee: lang === 'ru' ? 'Кофе' : 'Qahva',
+    decaf: lang === 'ru' ? 'Без кофеина' : 'Kofeinsiz',
     bakery: lang === 'ru' ? 'Выпечка' : 'Pishiriqlar',
     breakfast: lang === 'ru' ? 'Завтраки' : 'Nonushtalar',
     dessert: lang === 'ru' ? 'Десерты' : 'Desertlar',
@@ -23,21 +25,23 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
       ? 'Любой из видов кофе доступен на альтернативном молоке: кокосовое, миндальное, овсяное' 
       : 'Har qanday turdagi qahva muqobil sutda tayyorlanishi mumkin: kokos, bodom, suli suti',
     composition: lang === 'ru' ? 'Описание и состав' : 'Tavsif va tarkibi',
+    allergens: lang === 'ru' ? 'Аллергены' : 'Allergenlar',
     volume: lang === 'ru' ? 'Объем' : 'Hajmi',
     back: lang === 'ru' ? 'Назад' : 'Orqaga'
   };
 
   const categories = [
-    { id: 'all', name: t.all },
     { id: 'coffee', name: t.coffee },
-    { id: 'bakery', name: t.bakery },
     { id: 'breakfast', name: t.breakfast },
+    { id: 'serving', name: t.serving },
+    { id: 'news', name: t.news },
+    { id: 'decaf', name: t.decaf },
+    { id: 'bakery', name: t.bakery },
     { id: 'dessert', name: t.dessert },
   ];
 
-  const filteredItems = activeCategory === 'all' 
-    ? MENU_ITEMS 
-    : MENU_ITEMS.filter(item => item.category === activeCategory);
+  // Используем menuItems вместо MENU_ITEMS
+  const filteredItems = menuItems.filter(item => item.category === activeCategory);
 
   const renderPrice = (price: number | { [size: string]: number }) => {
     if (typeof price === 'number') {
@@ -75,7 +79,6 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
   return (
     <div className="flex flex-col h-full animate-fadeIn relative">
       <div className="sticky top-0 z-10 bg-[#faf9f6] dark:bg-[#121212] pt-4 pb-2 px-4 shadow-sm border-b border-[#9a644d]/5 dark:border-white/5 transition-colors">
-        <h2 className="text-2xl font-serif text-[#9a644d] dark:text-[#b8866b] mb-4">{t.title}</h2>
         <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
           {categories.map((cat) => (
             <button
@@ -94,7 +97,7 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
       </div>
 
       <div className="flex flex-col gap-4 p-4 pb-32">
-        {activeCategory === 'coffee' && (
+        {(activeCategory === 'coffee' || activeCategory === 'decaf') && (
           <div className="bg-[#9a644d]/5 dark:bg-[#b8866b]/10 p-3 rounded-xl border border-[#9a644d]/10 dark:border-[#b8866b]/20 mb-2">
             <p className="text-[11px] italic text-[#9a644d] dark:text-[#b8866b] leading-tight text-center">
               {t.altMilk}
@@ -132,11 +135,9 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
         </div>
       </div>
 
-      {/* Модальное окно деталей товара */}
       {selectedItem && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white dark:bg-[#1c1c1c] w-full max-w-lg rounded-t-[2.5rem] overflow-hidden animate-slideUp max-h-[92vh] flex flex-col shadow-2xl">
-            {/* Верхняя часть с картинкой */}
             <div className="relative h-64 flex-shrink-0">
               <img src={selectedItem.image} alt={selectedItem.name[lang]} className="w-full h-full object-cover" />
               <button 
@@ -150,17 +151,24 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
               <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#1c1c1c] to-transparent"></div>
             </div>
             
-            {/* Прокручиваемый контент */}
             <div className="p-6 pt-0 overflow-y-auto overscroll-contain flex-grow custom-scrollbar">
               <div className="flex justify-between items-start mb-6 pt-2">
                 <h3 className="text-3xl font-serif text-[#9a644d] dark:text-[#b8866b] leading-tight">{selectedItem.name[lang]}</h3>
               </div>
 
               {selectedItem.longDescription && (
-                <div className="mb-8">
+                <div className="mb-4">
                   <h4 className="text-[11px] uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 font-bold mb-3">{t.composition}</h4>
-                  <p className="text-[#2d2d2d] dark:text-[#e5e5e5] text-base leading-relaxed opacity-90 font-light">
+                  <p className="text-[#2d2d2d] dark:text-[#e5e5e5] text-base leading-relaxed opacity-90 font-light italic font-serif">
                     {selectedItem.longDescription[lang]}
+                  </p>
+                </div>
+              )}
+
+              {selectedItem.allergens && (
+                <div className="mb-8">
+                  <p className="text-[11px] italic text-[#6ca081] dark:text-[#8fc4a3] leading-relaxed">
+                    {t.allergens}: {selectedItem.allergens[lang]}
                   </p>
                 </div>
               )}
@@ -198,7 +206,6 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
                 </div>
               </div>
 
-              {/* Дополнительный отступ снизу гарантирует, что кнопка не будет "залипать" у края */}
               <div className="pb-12">
                 <button 
                   onClick={handleCloseItem}
