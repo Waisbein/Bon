@@ -26,4 +26,4 @@ export interface Branch {
   };
 }
 
-export type View = 'home' | 'menu' | 'branches';
+export type View = 'home' | 'menu' | 'branches' | 'promotions' | 'vacancies';
