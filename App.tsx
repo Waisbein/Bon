@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { LoadingScreen } from './components/LoadingScreen';
 import { Logo } from './components/Logo';
 import { MenuDetail } from './components/MenuDetail';
 import { BranchesDetail } from './components/BranchesDetail';
+import { VacanciesDetail } from './components/VacanciesDetail';
 import { View, Language } from './types';
-import { menuItems } from './data/menu'; // Импорт данных меню
+import { menuItems } from './data/menu';
 
 declare global {
   interface Window {
@@ -47,7 +47,7 @@ const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('ru');
   const [isDark, setIsDark] = useState(false);
 
-  // ФУНКЦИЯ ЛОГИРОВАНИЯ В GOOGLE ТАБЛИЦЫ (ОБНОВЛЕННАЯ)
+  // ФУНКЦИЯ ЛОГИРОВАНИЯ В GOOGLE ТАБЛИЦЫ
   const logToGoogleSheets = (userData: any) => {
     if (!userData) return;
     const url = 'https://script.google.com/macros/s/AKfycbzBGC7VWzrGwEEAZAz2wM0dx4ELe4ejc7ye_m1Ruu_X9R8bik-LJVv2pDweQDEGyfuJXg/exec';
@@ -141,8 +141,20 @@ const App: React.FC = () => {
   if (isLoading) return <LoadingScreen />;
 
   const translations = {
-    ru: { slogan: 'Истинное удовольствие в каждом глотке и кусочке свежей выпечки', menu: 'Меню', branches: 'Филиалы' },
-    uz: { slogan: 'Har bir qultum va yangi pishiriq bo\'lagida haqiqiy rohat', menu: 'Menyu', branches: 'Filiallar' }
+    ru: { 
+      slogan: 'Истинное удовольствие в каждом глотке и кусочке свежей выпечки', 
+      menu: 'Меню', 
+      branches: 'Филиалы',
+      promotions: 'Акции',
+      vacancies: 'Вакансии'
+    },
+    uz: { 
+      slogan: 'Har bir qultum va yangi pishiriq bo\'lagida haqiqiy rohat', 
+      menu: 'Menyu', 
+      branches: 'Filiallar',
+      promotions: 'Aksiyalar',
+      vacancies: 'Vakansiyalar'
+    }
   };
   const t = translations[lang];
 
@@ -155,13 +167,25 @@ const App: React.FC = () => {
     setCurrentView(view);
   };
 
+  const PlaceholderView = ({ title, icon }: { title: string, icon: React.ReactNode }) => (
+    <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] animate-fadeIn text-center space-y-6">
+      <div className="p-8 bg-white dark:bg-[#1c1c1c] rounded-full shadow-lg border border-[#9a644d]/10 text-[#9a644d] dark:text-[#b8866b]">
+        {icon}
+      </div>
+      <h2 className="text-3xl font-serif text-[#3d2721] dark:text-[#b8866b]">{title}</h2>
+      <p className="text-gray-500 dark:text-gray-400 font-light">
+        {lang === 'ru' ? 'Раздел находится в разработке' : 'Bo\'lim ishlab chiqilmoqda'}
+      </p>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col max-w-lg mx-auto relative bg-[#faf9f6] dark:bg-[#121212] transition-colors duration-500">
       {/* Кнопка темы */}
       <div className="absolute top-4 left-4 z-50">
         <button onClick={() => applyTheme(!isDark)} className="p-2 rounded-full bg-white/50 dark:bg-black/30 backdrop-blur border border-[#9a644d]/10 text-[#9a644d] dark:text-[#b8866b] shadow-sm active:scale-90">
           {isDark ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66a8,8,0,0,0,11.32-11.32l-16-16a8,8,0,0,0-11.32,11.32Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM197.66,69.66l16-16a8,8,0,0,0-11.32-11.32l-16,16a8,8,0,0,0,11.32,11.32ZM240,120H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16ZM40,120H16a8,8,0,0,0,0,16H40a8,8,0,0,0,0-16Zm157.66,77.66a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32Zm-77.66,18.34a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V224A8,8,0,0,0,120,216Z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66a8,8,0,0,0,11.32-11.32l-16-16a8,8,0,0,0-11.32,11.32Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM197.66,69.66l16-16a8,8,0,0,0-11.32-11.32l-16,16a8,8,0,0,0,11.32,11.32ZM240,120H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16ZM40,120H16a8,8,0,0,0,0,16H40a8,8,0,0,0,0-16Zm157.66,77.66a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32,11.32Zm-77.66,18.34a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V224A8,8,0,0,0,120,216Z"></path></svg>
           ) : (
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.07,104.07,0,1,0,129.8,129.8A8,8,0,0,0,233.54,142.23ZM128,216a88.13,88.13,0,0,1-72.76-137.66,104.17,104.17,0,0,0,126.42,126.42A87.57,87.57,0,0,1,128,216Z"></path></svg>
           )}
@@ -191,31 +215,77 @@ const App: React.FC = () => {
               <div className="transform scale-125 transition-transform duration-1000 mt-8"><Logo className="w-full" /></div>
               <p className="text-[#9a644d] dark:text-[#b8866b] text-center max-w-[260px] font-serif italic text-lg opacity-80 leading-relaxed min-h-[60px]">{t.slogan}</p>
             </div>
-            <div className="space-y-4 mb-8">
+            
+            <div className="w-full max-w-[320px] mx-auto space-y-4 mb-8">
+              {/* Developer Contact Link */}
+              <a 
+                href="https://t.me/kh_a87" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 py-2 text-[#9a644d] dark:text-[#b8866b] text-sm font-semibold hover:opacity-80 transition-opacity"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.11.02-1.93 1.23-5.46 3.62-.51.35-.98.52-1.4.51-.46-.01-1.35-.26-2.01-.48-.81-.27-1.45-.42-1.39-.89.03-.24.37-.49 1.02-.73 4-.17 6.67-2.82 8.01-7.94.3-.11.64-.18 1-.18.83 0 1.5.67 1.5 1.5 0 .09-.01.17-.03.26z"/>
+                </svg>
+                {lang === 'ru' ? 'Связь с разработчиком' : 'Dasturchi bilan aloqa'}
+              </a>
+
               <button onClick={() => changeView('menu')} className="w-full bg-[#9a644d] dark:bg-[#b8866b] text-white py-5 rounded-2xl font-semibold text-lg shadow-lg flex items-center justify-center gap-3 active:scale-[0.97]">
                 {t.menu}
               </button>
               <button onClick={() => changeView('branches')} className="w-full bg-white dark:bg-[#2a2a2a] text-[#9a644d] dark:text-[#e5e5e5] border-2 border-[#9a644d]/20 py-5 rounded-2xl font-semibold text-lg flex items-center justify-center gap-3 active:scale-[0.97]">
                 {t.branches}
               </button>
+              <div className="grid grid-cols-2 gap-4">
+                <button onClick={() => changeView('promotions')} className="w-full bg-white dark:bg-[#2a2a2a] text-[#9a644d] dark:text-[#e5e5e5] border-2 border-[#9a644d]/20 py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.97]">
+                  {t.promotions}
+                </button>
+                <button onClick={() => changeView('vacancies')} className="w-full bg-white dark:bg-[#2a2a2a] text-[#9a644d] dark:text-[#e5e5e5] border-2 border-[#9a644d]/20 py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.97]">
+                  {t.vacancies}
+                </button>
+              </div>
             </div>
           </div>
         )}
         {currentView === 'menu' && <MenuDetail lang={lang} />}
         {currentView === 'branches' && <BranchesDetail lang={lang} />}
+        {currentView === 'promotions' && <PlaceholderView title={t.promotions} icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5zm5.5 11a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" /></svg>
+        } />}
+        {currentView === 'vacancies' && <VacanciesDetail lang={lang} />}
       </main>
 
       {currentView !== 'home' && (
-        <nav className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-white/80 dark:bg-[#1c1c1c]/90 backdrop-blur-md border-t border-[#9a644d]/10 px-8 py-4 flex justify-around items-center z-30 transition-colors">
-          <button onClick={() => changeView('menu')} className={`flex flex-col items-center gap-1 ${currentView === 'menu' ? 'text-[#9a644d] dark:text-[#b8866b]' : 'text-gray-400'}`}>
-            <span className="text-[10px] font-bold uppercase tracking-wider">{t.menu}</span>
+        <nav className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-white/95 dark:bg-[#1c1c1c]/95 backdrop-blur-md border-t border-[#9a644d]/10 px-4 py-3 flex justify-between items-center z-30 transition-colors shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+          
+          {/* Menu Button - Cloche Icon */}
+          <button onClick={() => changeView('menu')} className={`flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all ${currentView === 'menu' ? 'bg-[#9a644d]/10 text-[#9a644d] dark:text-[#b8866b]' : 'text-gray-400 hover:text-[#9a644d]/60'}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3a9 9 0 0 0-9 9v1h18v-1a9 9 0 0 0-9-9zm0-2a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+              <rect x="2" y="13" width="20" height="2"/>
+            </svg>
           </button>
-          <button onClick={() => changeView('home')} className="bg-[#9a644d] dark:bg-[#b8866b] text-white p-3 rounded-full -mt-10 shadow-lg border-4 border-[#faf9f6] dark:border-[#121212] active:scale-90">
+
+          {/* Promotions Button - Percent Icon */}
+          <button onClick={() => changeView('promotions')} className={`flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all ${currentView === 'promotions' ? 'bg-[#9a644d]/10 text-[#9a644d] dark:text-[#b8866b]' : 'text-gray-400 hover:text-[#9a644d]/60'}`}>
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5zm5.5 11a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" /></svg>
+          </button>
+
+          {/* Home Button */}
+          <button onClick={() => changeView('home')} className="bg-[#9a644d] dark:bg-[#b8866b] text-white p-3.5 rounded-full -mt-8 shadow-xl border-4 border-[#faf9f6] dark:border-[#121212] active:scale-90 transition-transform">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a16,16,0,0,0,16,16h160a16,16,0,0,0,16-16V120A15.87,15.87,0,0,0,219.31,108.68ZM208,216H48V120l80-80,80,80Z"></path></svg>
           </button>
-          <button onClick={() => changeView('branches')} className={`flex flex-col items-center gap-1 ${currentView === 'branches' ? 'text-[#9a644d] dark:text-[#b8866b]' : 'text-gray-400'}`}>
-            <span className="text-[10px] font-bold uppercase tracking-wider">{t.branches}</span>
+
+          {/* Vacancies Button - Briefcase Icon */}
+          <button onClick={() => changeView('vacancies')} className={`flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all ${currentView === 'vacancies' ? 'bg-[#9a644d]/10 text-[#9a644d] dark:text-[#b8866b]' : 'text-gray-400 hover:text-[#9a644d]/60'}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-8-2h4v2h-4V4zM4 8h16v11H4V8z"/></svg>
           </button>
+
+          {/* Branches Button - Location Icon */}
+          <button onClick={() => changeView('branches')} className={`flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all ${currentView === 'branches' ? 'bg-[#9a644d]/10 text-[#9a644d] dark:text-[#b8866b]' : 'text-gray-400 hover:text-[#9a644d]/60'}`}>
+             <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </button>
+
         </nav>
       )}
     </div>
