@@ -81,7 +81,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'цитрус', uz: 'sitrus' },
     price: 42000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/ChiaPuding.png"
+    image: `${IMG_BASE}/3. Завтраки/ChiaPuding.webp`
   },
   {
     id: 'br-2',
@@ -90,7 +90,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'лактоза, орехи, мед, глютен', uz: 'laktosa, yong\'oqlar, asal, glyuten' },
     price: 45000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/GranolaKlassicheskaya.png"
+    image: `${IMG_BASE}/3. Завтраки/GranolaKlassicheskaya.webp`
   },
   {
     id: 'br-3',
@@ -99,7 +99,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'глютен', uz: 'glyuten' },
     price: 45000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/Kasha5ZlakovNaKokosovom.png"
+    image: `${IMG_BASE}/3. Завтраки/Kasha5ZlakovNaKokosovom.webp`
   },
   {
     id: 'br-4',
@@ -108,7 +108,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'глютен, лактоза и цитрус', uz: 'glyuten, laktosa va sitrus' },
     price: 40000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/Kasha5ZlakovNaMoloke.png"
+    image: `${IMG_BASE}/3. Завтраки/Kasha5ZlakovNaMoloke.webp`
   },
   {
     id: 'br-5',
@@ -117,7 +117,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'яйцо, лактоза, глютен, мед', uz: 'tuxum, laktosa, glyuten, asal' },
     price: 33000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/FrantsuzskiyTostSVanilnym.png"
+    image: `${IMG_BASE}/3. Завтраки/FrantsuzskiyTostSVanilnym.webp`
   },
   {
     id: 'br-6',
@@ -126,7 +126,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'яйцо, лактоза, глютен', uz: 'tuxum, laktosa, glyuten' },
     price: 33000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/FrantsuzskiyTostSYablokom.png"
+    image: `${IMG_BASE}/3. Завтраки/FrantsuzskiyTostSYablokom.webp`
   },
   {
     id: 'br-7',
@@ -135,7 +135,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'яйцо, семечки подсолнечника, грибы, глютен', uz: 'tuxum, kungaboqar urug\'lari, qo\'ziqorinlar, glyuten' },
     price: 50000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/KlassicheskiyZavtrakVetchina.png"
+    image: `${IMG_BASE}/3. Завтраки/KlassicheskiyZavtrakVetchina.webp`
   },
   {
     id: 'br-8',
@@ -144,7 +144,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'яйцо, семечки подсолнечника, грибы, глютен', uz: 'tuxum, kungaboqar urug\'lari, qo\'ziqorinlar, glyuten' },
     price: 50000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/KlassicheskiyZavtrakKolbaski.png"
+    image: `${IMG_BASE}/3. Завтраки/KlassicheskiyZavtrakKolbaski.webp`
   },
   {
     id: 'br-9',
@@ -153,7 +153,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'яйцо, семечки подсолнечника, грибы, глютен', uz: 'tuxum, kungaboqar urug\'lari, qo\'ziqorinlar, glyuten' },
     price: 50000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/KlassicheskiyZavtrakKuritsa.png"
+    image: `${IMG_BASE}/3. Завтраки/KlassicheskiyZavtrakKuritsa.webp`
   },
   {
     id: 'br-10',
@@ -162,7 +162,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'лактоза, глютен, горчица, лосось', uz: 'laktosa, glyuten, xantal, losos' },
     price: 80000,
     category: 'breakfast',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8/KontinentalniyZavtrak.png"
+    image: `${IMG_BASE}/3. Завтраки/KontinentalniyZavtrak.webp`
   },
 
   // НОВАЯ ПОДАЧА
@@ -177,7 +177,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'Яйцо, лосось, глютен, орех', uz: 'Tuxum, losos, glyuten, yong\'oq' },
     price: 82000,
     category: 'serving',
-    image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?q=80&w=400&auto=format&fit=crop'
+    image: `${IMG_BASE}/2.Новая подача/SkremblSLososemVKruassane.webp`
   },
   {
     id: 's2',
@@ -190,7 +190,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'Тунец, яйцо', uz: 'Tyunets, tuxum' },
     price: 69000,
     category: 'serving',
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=400&auto=format&fit=crop'
+    image: `${IMG_BASE}/2.Новая подача/SalatNicoise.webp`
   },
   {
     id: 's3',
@@ -203,7 +203,7 @@ export const menuItems: MenuItem[] = [
     allergens: { ru: 'Лактоза, яйцо, ягоды', uz: 'Laktosa, tuxum, rezavorlar' },
     price: 55000,
     category: 'serving',
-    image: 'https://images.unsplash.com/photo-1541512416146-3cf58d6b27cc?q=80&w=400&auto=format&fit=crop'
+    image: `${IMG_BASE}/2.Новая подача/RikotnikSMorozhenym.webp`
   },
 
   // КОФЕ
