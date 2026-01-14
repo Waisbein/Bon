@@ -4,10 +4,11 @@ import { Language, MenuItem } from '../types';
 
 interface MenuDetailProps {
   lang: Language;
+  initialCategory?: string;
 }
 
-export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
-  const [activeCategory, setActiveCategory] = useState<string>('coffee');
+export const MenuDetail: React.FC<MenuDetailProps> = ({ lang, initialCategory = 'coffee' }) => {
+  const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
