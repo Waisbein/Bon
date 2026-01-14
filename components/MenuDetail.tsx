@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { menuItems } from '../data/menu'; // Изменен путь и название
+import { menuItems } from '../data/menu';
 import { Language, MenuItem } from '../types';
 
 interface MenuDetailProps {
@@ -10,6 +9,7 @@ interface MenuDetailProps {
 export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
   const [activeCategory, setActiveCategory] = useState<string>('coffee');
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const t = {
     title: lang === 'ru' ? 'Наше Меню' : 'Bizning Menyu',
@@ -27,7 +27,9 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
     composition: lang === 'ru' ? 'Описание и состав' : 'Tavsif va tarkibi',
     allergens: lang === 'ru' ? 'Аллергены' : 'Allergenlar',
     volume: lang === 'ru' ? 'Объем' : 'Hajmi',
-    back: lang === 'ru' ? 'Назад' : 'Orqaga'
+    back: lang === 'ru' ? 'Назад' : 'Orqaga',
+    search: lang === 'ru' ? 'Поиск...' : 'Qidirish...',
+    nothingFound: lang === 'ru' ? 'Ничего не найдено' : 'Hech narsa topilmadi'
   };
 
   const categories = [
@@ -40,8 +42,20 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
     { id: 'dessert', name: t.dessert },
   ];
 
-  // Используем menuItems вместо MENU_ITEMS
-  const filteredItems = menuItems.filter(item => item.category === activeCategory);
+  const filteredItems = menuItems.filter(item => {
+    const query = searchQuery.toLowerCase().trim();
+    if (query) {
+      // Ищем совпадение в названии блюда
+      const matchesName = item.name[lang].toLowerCase().includes(query);
+      
+      // Ищем совпадение в названии категории (например, по запросу "Кофе" выдаем весь раздел)
+      const categoryObj = categories.find(c => c.id === item.category);
+      const matchesCategory = categoryObj ? categoryObj.name.toLowerCase().includes(query) : false;
+
+      return matchesName || matchesCategory;
+    }
+    return item.category === activeCategory;
+  });
 
   const renderPrice = (price: number | { [size: string]: number }) => {
     if (typeof price === 'number') {
@@ -78,30 +92,64 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang }) => {
 
   return (
     <div className="flex flex-col h-full animate-fadeIn relative">
-      <div className="sticky top-0 z-10 bg-[#faf9f6] dark:bg-[#121212] pt-4 pb-2 px-4 shadow-sm border-b border-[#9a644d]/5 dark:border-white/5 transition-colors">
-        <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-all ${
-                activeCategory === cat.id
-                  ? 'bg-[#9a644d] dark:bg-[#b8866b] text-white'
-                  : 'bg-white dark:bg-[#2a2a2a] border border-[#9a644d]/20 dark:border-white/10 text-[#9a644d] dark:text-[#e5e5e5]'
-              }`}
+      <div className="sticky top-0 z-10 bg-[#faf9f6] dark:bg-[#121212] pt-4 px-4 shadow-sm border-b border-[#9a644d]/5 dark:border-white/5 transition-colors">
+        
+        {/* Search Input */}
+        <div className="relative mb-3">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t.search}
+            className="w-full bg-white dark:bg-[#1c1c1c] border border-[#9a644d]/20 dark:border-white/10 rounded-xl py-3 pl-10 pr-10 text-sm text-[#2d2d2d] dark:text-[#f0f0f0] placeholder-gray-400 focus:outline-none focus:border-[#9a644d] transition-all"
+          />
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#9a644d] p-1"
             >
-              {cat.name}
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
             </button>
-          ))}
+          )}
         </div>
+
+        {/* Categories (hidden when searching) */}
+        {!searchQuery && (
+          <div className="flex overflow-x-auto pb-4 gap-2 no-scrollbar animate-fadeIn">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-all ${
+                  activeCategory === cat.id
+                    ? 'bg-[#9a644d] dark:bg-[#b8866b] text-white'
+                    : 'bg-white dark:bg-[#2a2a2a] border border-[#9a644d]/20 dark:border-white/10 text-[#9a644d] dark:text-[#e5e5e5]'
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-4 p-4 pb-32">
-        {(activeCategory === 'coffee' || activeCategory === 'decaf') && (
+        {!searchQuery && (activeCategory === 'coffee' || activeCategory === 'decaf') && (
           <div className="bg-[#9a644d]/5 dark:bg-[#b8866b]/10 p-3 rounded-xl border border-[#9a644d]/10 dark:border-[#b8866b]/20 mb-2">
             <p className="text-[11px] italic text-[#9a644d] dark:text-[#b8866b] leading-tight text-center">
               {t.altMilk}
             </p>
+          </div>
+        )}
+
+        {searchQuery && filteredItems.length === 0 && (
+          <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+            {t.nothingFound}
           </div>
         )}
         
