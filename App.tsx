@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LoadingScreen } from './components/LoadingScreen';
 import { Logo } from './components/Logo';
@@ -47,6 +46,11 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('home');
   const [lang, setLang] = useState<Language>('uz');
   const [isDark, setIsDark] = useState(false);
+  const [menuTargetCategory, setMenuTargetCategory] = useState<string>('coffee');
+  
+  // Состояния для сторис-баннера
+  const [showStory, setShowStory] = useState(true);
+  const [storyProgress, setStoryProgress] = useState(0);
 
   // ФУНКЦИЯ ЛОГИРОВАНИЯ В GOOGLE ТАБЛИЦЫ
   const logToGoogleSheets = (userData: any) => {
@@ -139,6 +143,26 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Логика таймера для сторис
+  useEffect(() => {
+    if (!isLoading && showStory && currentView === 'home') {
+      // Запускаем прогресс бар
+      const progressTimer = setTimeout(() => {
+        setStoryProgress(100);
+      }, 100);
+
+      // Закрываем через 6 секунд
+      const closeTimer = setTimeout(() => {
+        setShowStory(false);
+      }, 6000);
+
+      return () => {
+        clearTimeout(progressTimer);
+        clearTimeout(closeTimer);
+      };
+    }
+  }, [isLoading, showStory, currentView]);
+
   if (isLoading) return <LoadingScreen />;
 
   const translations = {
@@ -165,7 +189,24 @@ const App: React.FC = () => {
 
   const changeView = (view: View) => {
     handleImpact();
+    // Сбрасываем категорию на 'coffee', если переходим в меню через навигацию
+    if (view === 'menu') {
+      setMenuTargetCategory('coffee');
+    }
     setCurrentView(view);
+  };
+
+  const handleStoryClick = () => {
+    handleImpact('medium');
+    setShowStory(false);
+    setMenuTargetCategory('bakery'); // Устанавливаем категорию выпечки
+    setCurrentView('menu'); // Открываем меню
+  };
+
+  const handleCloseStory = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleImpact('light');
+    setShowStory(false);
   };
 
   const PlaceholderView = ({ title, icon }: { title: string, icon: React.ReactNode }) => (
@@ -212,8 +253,60 @@ const App: React.FC = () => {
       <main className="flex-grow overflow-y-auto overflow-x-hidden">
         {currentView === 'home' && (
           <div className="min-h-screen flex flex-col justify-between p-8 bg-gradient-to-b from-[#faf9f6] to-white dark:from-[#121212] dark:to-[#1a1a1a] animate-fadeIn">
+            
+            {/* Story Banner */}
+            <div className={`w-full relative transition-all duration-700 ease-in-out overflow-hidden ${showStory ? 'max-h-[220px] opacity-100 mb-6 mt-10' : 'max-h-0 opacity-0 mb-0 mt-0'}`}>
+              <div 
+                className="relative w-full h-48 rounded-2xl overflow-hidden shadow-xl shadow-[#9a644d]/20 dark:shadow-black/50 cursor-pointer group transform transition-transform active:scale-[0.98]"
+                onClick={handleStoryClick}
+              >
+                {/* Image */}
+                <img 
+                  src="/menu/Promos/evening.webp" 
+                  alt="Special Offer" 
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                
+                {/* Progress Bar */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-white/30 z-20">
+                    <div 
+                      className="h-full bg-white transition-all ease-linear"
+                      style={{ 
+                        width: `${storyProgress}%`, 
+                        transitionDuration: '6000ms'
+                      }}
+                    ></div>
+                </div>
+
+                {/* Close Button */}
+                <button 
+                    onClick={handleCloseStory}
+                    className="absolute top-3 right-3 z-30 p-1.5 bg-black/20 backdrop-blur-md rounded-full text-white hover:bg-black/40 transition-colors"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+                    </svg>
+                </button>
+                
+                {/* Text Label */}
+                <div className="absolute bottom-4 left-4 right-4 z-20">
+                   <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg border border-white/20">
+                     <span className="text-white text-xs font-bold tracking-wide uppercase">
+                        {lang === 'ru' ? 'Акция' : 'Aksiya'}
+                     </span>
+                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="white" viewBox="0 0 256 256">
+                       <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+                     </svg>
+                   </div>
+                </div>
+              </div>
+            </div>
+
             <div className="flex-1 flex flex-col items-center justify-center space-y-10">
-              <div className="transform scale-125 transition-transform duration-1000 mt-8"><Logo className="w-full" /></div>
+              <div className="transform scale-125 transition-transform duration-1000 mt-4"><Logo className="w-full" /></div>
               <p className="text-[#9a644d] dark:text-[#b8866b] text-center max-w-[260px] font-serif italic text-lg opacity-80 leading-relaxed min-h-[60px]">{t.slogan}</p>
             </div>
             
@@ -256,7 +349,7 @@ const App: React.FC = () => {
             </div>
           </div>
         )}
-        {currentView === 'menu' && <MenuDetail lang={lang} />}
+        {currentView === 'menu' && <MenuDetail lang={lang} initialCategory={menuTargetCategory} />}
         {currentView === 'branches' && <BranchesDetail lang={lang} />}
         {currentView === 'promotions' && <PlaceholderView title={t.promotions} icon={
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5zm5.5 11a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" /></svg>
