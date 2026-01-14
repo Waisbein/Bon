@@ -1,9 +1,9 @@
+
 import { MenuItem, Branch } from '../types';
 
 const ASSETS_BASE_URL = "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu";
 const NEWS_FOLDER = "1.%D0%9D%D0%BE%D0%B2%D0%B8%D0%BD%D0%BA%D0%B8";
-const BREAKFASTS_ASSETS_URL = "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/3.%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%D0%B8";
-const COFFEE_ASSETS_URL = "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/%D0%9A%D0%BE%D1%84%D0%B5";
+const IMG_BASE = '/menu';
 
 export const menuItems: MenuItem[] = [
   // 1. НОВИНКИ
@@ -213,7 +213,7 @@ export const menuItems: MenuItem[] = [
     price: { 'Petit': 20000, 'Grand': 23000 },
     volumes: { 'Petit': '30 мл', 'Grand': '60 мл' },
     category: 'coffee',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/%D0%9A%D0%BE%D1%84%D0%B5/espresso.png"
+    image: `${IMG_BASE}/Кофе/espresso.webp`
   },
   {
     id: 'c2',
@@ -221,7 +221,7 @@ export const menuItems: MenuItem[] = [
     price: { 'Petit': 21000, 'Grand': 24000 },
     volumes: { 'Petit': '200 мл', 'Grand': '300 мл' },
     category: 'coffee',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/%D0%9A%D0%BE%D1%84%D0%B5/amerikano.png"
+    image: `${IMG_BASE}/Кофе/amerikano.webp`
   },
   {
     id: 'c3',
@@ -229,7 +229,7 @@ export const menuItems: MenuItem[] = [
     price: { 'Petit': 25000, 'Grand': 31000, 'Extra Grand': 39000 },
     volumes: { 'Petit': '200 мл', 'Grand': '300 мл', 'Extra Grand': '450 мл' },
     category: 'coffee',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/%D0%9A%D0%BE%D1%84%D0%B5/kapuchino.png"
+    image: `${IMG_BASE}/Кофе/kapuchino.webp`
   },
   {
     id: 'c4',
@@ -237,7 +237,7 @@ export const menuItems: MenuItem[] = [
     price: { 'Grand': 27000, 'Extra Grand': 37000 },
     volumes: { 'Grand': '300 мл', 'Extra Grand': '450 мл' },
     category: 'coffee',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/%D0%9A%D0%BE%D1%84%D0%B5/latte.png"
+    image: `${IMG_BASE}/Кофе/latte.webp`
   },
   {
     id: 'c5',
@@ -245,7 +245,7 @@ export const menuItems: MenuItem[] = [
     price: { 'Petit': 29000 },
     volumes: { 'Petit': '200 мл' },
     category: 'coffee',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/%D0%9A%D0%BE%D1%84%D0%B5/fletuayt.png"
+    image: `${IMG_BASE}/Кофе/fletuayt.webp`
   },
   {
     id: 'c6',
@@ -254,7 +254,7 @@ export const menuItems: MenuItem[] = [
     price: { 'Grand': 42000 },
     volumes: { 'Grand': '300 мл' },
     category: 'coffee',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/%D0%9A%D0%BE%D1%84%D0%B5/raf.png"
+    image: `${IMG_BASE}/Кофе/raf.webp`
   },
   {
     id: 'c7',
@@ -266,7 +266,7 @@ export const menuItems: MenuItem[] = [
     },
     price: 7000,
     category: 'coffee',
-    image: "https://raw.githubusercontent.com/Waisbein/Waisbein/main/public/menu/%D0%9A%D0%BE%D1%84%D0%B5/sirop.jpg"
+    image: `${IMG_BASE}/Кофе/sirop.webp`
   },
 
   // БЕЗ КОФЕИНА
