@@ -44,12 +44,13 @@ declare global {
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentView, setCurrentView] = useState<View>('home');
-  const [lang, setLang] = useState<Language>('uz');
+  const [lang, setLang] = useState<Language>('ru');
   const [isDark, setIsDark] = useState(false);
   const [menuTargetCategory, setMenuTargetCategory] = useState<string>('coffee');
   
   // Состояния для сторис-баннера
   const [showStory, setShowStory] = useState(true);
+  const [isExiting, setIsExiting] = useState(false); // Для анимации закрытия
   const [storyProgress, setStoryProgress] = useState(0);
 
   // ФУНКЦИЯ ЛОГИРОВАНИЯ В GOOGLE ТАБЛИЦЫ
@@ -151,10 +152,10 @@ const App: React.FC = () => {
         setStoryProgress(100);
       }, 100);
 
-      // Закрываем через 6 секунд
+      // Закрываем через 7 секунд (плавное исчезновение)
       const closeTimer = setTimeout(() => {
-        setShowStory(false);
-      }, 6000);
+        startExitAnimation();
+      }, 7000);
 
       return () => {
         clearTimeout(progressTimer);
@@ -162,6 +163,14 @@ const App: React.FC = () => {
       };
     }
   }, [isLoading, showStory, currentView]);
+
+  const startExitAnimation = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      setShowStory(false);
+      setIsExiting(false);
+    }, 500); // Ждем завершения CSS анимации (duration-500)
+  };
 
   if (isLoading) return <LoadingScreen />;
 
@@ -171,14 +180,20 @@ const App: React.FC = () => {
       menu: 'Меню', 
       branches: 'Филиалы',
       promotions: 'Акции',
-      vacancies: 'Вакансии'
+      vacancies: 'Вакансии',
+      viewMenu: 'Посмотреть меню',
+      storyTitle: 'Вечерняя выпечка',
+      storyDesc: 'Скидка -50% на всю выпечку после 20:00'
     },
     uz: { 
       slogan: 'Har bir qultum va yangi pishiriq bo\'lagida haqiqiy rohat', 
       menu: 'Menyu', 
       branches: 'Filiallar',
       promotions: 'Aksiyalar',
-      vacancies: 'Vakansiyalar'
+      vacancies: 'Vakansiyalar',
+      viewMenu: 'Menyuni ko\'rish',
+      storyTitle: 'Kechki pishiriqlar',
+      storyDesc: '20:00 dan keyin barcha pishiriqlarga -50% chegirma'
     }
   };
   const t = translations[lang];
@@ -198,7 +213,7 @@ const App: React.FC = () => {
 
   const handleStoryClick = () => {
     handleImpact('medium');
-    setShowStory(false);
+    startExitAnimation();
     setMenuTargetCategory('bakery'); // Устанавливаем категорию выпечки
     setCurrentView('menu'); // Открываем меню
   };
@@ -206,7 +221,7 @@ const App: React.FC = () => {
   const handleCloseStory = (e: React.MouseEvent) => {
     e.stopPropagation();
     handleImpact('light');
-    setShowStory(false);
+    startExitAnimation();
   };
 
   const PlaceholderView = ({ title, icon }: { title: string, icon: React.ReactNode }) => (
@@ -223,6 +238,59 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col max-w-lg mx-auto relative bg-[#faf9f6] dark:bg-[#121212] transition-colors duration-500">
+      
+      {/* Full Screen Story Overlay */}
+      {showStory && currentView === 'home' && (
+        <div className={`fixed inset-0 z-[9999] bg-black flex flex-col transition-opacity duration-500 ${isExiting ? 'opacity-0' : 'opacity-100'}`}>
+          
+          {/* Progress Bar */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gray-500/30 z-20 mx-2 mt-2 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-white transition-all ease-linear rounded-full"
+              style={{ 
+                width: `${storyProgress}%`, 
+                transitionDuration: '7000ms'
+              }}
+            ></div>
+          </div>
+
+          {/* Close Button */}
+          <button 
+            onClick={handleCloseStory}
+            className="absolute top-4 right-4 z-30 p-2 text-white/80 hover:text-white transition-colors active:scale-90"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256">
+              <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+            </svg>
+          </button>
+
+          {/* Image Background */}
+          <div className="absolute inset-0 z-0">
+             <img 
+               src="/menu/Promos/evening.webp" 
+               alt="Story" 
+               className="w-full h-full object-cover"
+             />
+             {/* Gradient Overlay for Text Readability */}
+             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+          </div>
+
+          {/* Content Area (Bottom Third) */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 p-8 pb-12 flex flex-col items-start gap-4">
+            <button 
+              onClick={handleStoryClick}
+              className="w-full bg-white text-black font-bold py-4 rounded-xl mt-4 active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+            >
+              <span>{t.viewMenu}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      )}
+
       {/* Кнопка темы */}
       <div className="absolute top-4 left-4 z-50">
         <button onClick={() => applyTheme(!isDark)} className="p-2 rounded-full bg-white/50 dark:bg-black/30 backdrop-blur border border-[#9a644d]/10 text-[#9a644d] dark:text-[#b8866b] shadow-sm active:scale-90">
@@ -236,8 +304,8 @@ const App: React.FC = () => {
 
       {/* Переключатель языков */}
       <div className="absolute top-4 right-4 z-50 flex bg-white/50 dark:bg-black/30 backdrop-blur rounded-full p-1 border border-[#9a644d]/10">
-        <button onClick={() => { handleImpact(); setLang('uz'); }} className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${lang === 'uz' ? 'bg-[#9a644d] text-white' : 'text-[#9a644d] dark:text-[#b8866b] opacity-60'}`}>UZ</button>
         <button onClick={() => { handleImpact(); setLang('ru'); }} className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${lang === 'ru' ? 'bg-[#9a644d] text-white' : 'text-[#9a644d] dark:text-[#b8866b] opacity-60'}`}>RU</button>
+        <button onClick={() => { handleImpact(); setLang('uz'); }} className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${lang === 'uz' ? 'bg-[#9a644d] text-white' : 'text-[#9a644d] dark:text-[#b8866b] opacity-60'}`}>UZ</button>
       </div>
 
       {currentView !== 'home' && (
@@ -254,57 +322,6 @@ const App: React.FC = () => {
         {currentView === 'home' && (
           <div className="min-h-screen flex flex-col justify-between p-8 bg-gradient-to-b from-[#faf9f6] to-white dark:from-[#121212] dark:to-[#1a1a1a] animate-fadeIn">
             
-            {/* Story Banner */}
-            <div className={`w-full relative transition-all duration-700 ease-in-out overflow-hidden ${showStory ? 'max-h-[220px] opacity-100 mb-6 mt-10' : 'max-h-0 opacity-0 mb-0 mt-0'}`}>
-              <div 
-                className="relative w-full h-48 rounded-2xl overflow-hidden shadow-xl shadow-[#9a644d]/20 dark:shadow-black/50 cursor-pointer group transform transition-transform active:scale-[0.98]"
-                onClick={handleStoryClick}
-              >
-                {/* Image */}
-                <img 
-                  src="/menu/Promos/evening.webp" 
-                  alt="Special Offer" 
-                  className="w-full h-full object-cover"
-                />
-                
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                
-                {/* Progress Bar */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-white/30 z-20">
-                    <div 
-                      className="h-full bg-white transition-all ease-linear"
-                      style={{ 
-                        width: `${storyProgress}%`, 
-                        transitionDuration: '6000ms'
-                      }}
-                    ></div>
-                </div>
-
-                {/* Close Button */}
-                <button 
-                    onClick={handleCloseStory}
-                    className="absolute top-3 right-3 z-30 p-1.5 bg-black/20 backdrop-blur-md rounded-full text-white hover:bg-black/40 transition-colors"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
-                      <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
-                    </svg>
-                </button>
-                
-                {/* Text Label */}
-                <div className="absolute bottom-4 left-4 right-4 z-20">
-                   <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg border border-white/20">
-                     <span className="text-white text-xs font-bold tracking-wide uppercase">
-                        {lang === 'ru' ? 'Акция' : 'Aksiya'}
-                     </span>
-                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="white" viewBox="0 0 256 256">
-                       <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-                     </svg>
-                   </div>
-                </div>
-              </div>
-            </div>
-
             <div className="flex-1 flex flex-col items-center justify-center space-y-10">
               <div className="transform scale-125 transition-transform duration-1000 mt-4"><Logo className="w-full" /></div>
               <p className="text-[#9a644d] dark:text-[#b8866b] text-center max-w-[260px] font-serif italic text-lg opacity-80 leading-relaxed min-h-[60px]">{t.slogan}</p>
