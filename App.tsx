@@ -218,17 +218,18 @@ const App: React.FC = () => {
             
             <div className="w-full max-w-[320px] mx-auto space-y-4 mb-8">
               {/* Developer Contact Link */}
-              <a 
-                href="https://t.me/kh_a87" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-2 text-[#9a644d] dark:text-[#b8866b] text-sm font-semibold hover:opacity-80 transition-opacity"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.11.02-1.93 1.23-5.46 3.62-.51.35-.98.52-1.4.51-.46-.01-1.35-.26-2.01-.48-.81-.27-1.45-.42-1.39-.89.03-.24.37-.49 1.02-.73 4-.17 6.67-2.82 8.01-7.94.3-.11.64-.18 1-.18.83 0 1.5.67 1.5 1.5 0 .09-.01.17-.03.26z"/>
-                </svg>
-                {lang === 'ru' ? 'Связь с разработчиком' : 'Dasturchi bilan aloqa'}
-              </a>
+<a 
+  href="https://t.me/kh_a87" 
+  target="_blank" 
+  rel="noopener noreferrer"
+  className="flex items-center justify-center gap-2.5 py-2 text-[#9a644d] dark:text-[#b8866b] text-sm font-semibold hover:opacity-80 transition-opacity"
+>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
+    <circle cx="12" cy="12" r="12" fill="currentColor" fillOpacity="0.15"/>
+    <path d="M16.5 8.5L6.5 12.5L9.5 14L11 18.5L13.5 15L16.5 17.5L19.5 5.5L16.5 8.5Z" fill="currentColor"/>
+  </svg>
+  {lang === 'ru' ? 'Связь с разработчиком' : 'Dasturchi bilan aloqa'}
+</a>
 
               <button onClick={() => changeView('menu')} className="w-full bg-[#9a644d] dark:bg-[#b8866b] text-white py-5 rounded-2xl font-semibold text-lg shadow-lg flex items-center justify-center gap-3 active:scale-[0.97]">
                 {t.menu}
