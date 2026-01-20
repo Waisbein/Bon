@@ -154,38 +154,39 @@ const App: React.FC = () => {
   // ФУНКЦИЯ ЗАГРУЗКИ МЕНЮ (GET)
   const loadMenu = async () => {
     try {
-      // Используем GET и credentials: 'omit' для предотвращения проблем с CORS при редиректах GAS
-      const response = await fetch(`${SCRIPT_URL}?action=get_menu`, {
-        method: 'GET',
-      });
+      const response = await fetch(`${SCRIPT_URL}?action=get_menu`);
 
       if (response.ok) {
         const data = await response.json();
-        // Предполагаем, что data.items - это массив объектов из таблицы
+        // Если пришли данные, формируем список меню на их основе
         if (data && Array.isArray(data.items)) {
-          const updatedMenu = staticMenuItems.map(staticItem => {
-            // Ищем совпадение по ID
-            const remoteItem = data.items.find((r: any) => r.id === staticItem.id);
-            if (remoteItem) {
-              // Если нашли, обновляем цены, названия и КАТЕГОРИЮ, сохраняя локальные картинки
-              return {
-                ...staticItem,
-                // Обновляем категорию из таблицы, если она там есть
-                category: remoteItem.category || staticItem.category,
-                price: remoteItem.price !== undefined ? remoteItem.price : staticItem.price,
-                name: {
-                  ru: remoteItem.name_ru || staticItem.name.ru,
-                  uz: remoteItem.name_uz || staticItem.name.uz
-                },
-                description: staticItem.description ? {
-                  ru: remoteItem.description_ru || staticItem.description.ru,
-                  uz: remoteItem.description_uz || staticItem.description.uz
-                } : staticItem.description
-              };
-            }
-            return staticItem;
+          const newMenuItems = data.items.map((r: any) => {
+            // Находим локальный элемент для подстановки картинки и сложного описания
+            const local = staticMenuItems.find(s => s.id === r.id);
+            
+            return {
+              id: r.id,
+              name: {
+                ru: r.name_ru || local?.name.ru || '',
+                uz: r.name_uz || local?.name.uz || ''
+              },
+              description: (r.description_ru || r.description_uz) 
+                ? { ru: r.description_ru || '', uz: r.description_uz || '' }
+                : local?.description,
+              // Сохраняем локальные данные, если их нет в таблице
+              longDescription: local?.longDescription,
+              allergens: local?.allergens,
+              volumes: local?.volumes,
+              price: r.price !== undefined ? r.price : (local?.price || 0),
+              // Категория строго из таблицы, если есть
+              category: r.category || local?.category || 'coffee',
+              // Картинка строго по ID из статики, если есть
+              image: local?.image || r.image || '',
+              section: local?.section
+            } as MenuItem;
           });
-          setMenuItems(updatedMenu);
+          
+          setMenuItems(newMenuItems);
         }
       }
     } catch (error) {
