@@ -151,46 +151,47 @@ const App: React.FC = () => {
     }
   };
 
-  // ФУНКЦИЯ ЗАГРУЗКИ МЕНЮ (GET)
+  // ФУНКЦИЯ ЗАГРУЗКИ МЕНЮ (GET) — ИСПРАВЛЕННАЯ
   const loadMenu = async () => {
     try {
+      console.log('Запрашиваю меню из таблицы...');
       const response = await fetch(`${SCRIPT_URL}?action=get_menu`);
 
       if (response.ok) {
         const data = await response.json();
-        // Если пришли данные, формируем список меню на их основе
-        if (data && Array.isArray(data.items)) {
-          const newMenuItems = data.items.map((r: any) => {
-            // Находим локальный элемент для подстановки картинки и сложного описания
-            const local = staticMenuItems.find(s => s.id === r.id);
+        console.log('Данные из таблицы получены:', data);
+
+        // Проверяем, что пришел массив
+        if (data && Array.isArray(data)) {
+          const newMenuItems = data.map((r: any) => {
+            // Ищем локальный товар для картинки и описания
+            const local = staticMenuItems.find(s => s.id === String(r.id));
             
             return {
-              id: r.id,
+              id: String(r.id),
               name: {
-                ru: r.name_ru || local?.name.ru || '',
-                uz: r.name_uz || local?.name.uz || ''
+                // Берем из таблицы (структура name.ru), если нет — из кода
+                ru: r.name?.ru || local?.name.ru || '',
+                uz: r.name?.uz || local?.name.uz || ''
               },
-              description: (r.description_ru || r.description_uz) 
-                ? { ru: r.description_ru || '', uz: r.description_uz || '' }
-                : local?.description,
-              // Сохраняем локальные данные, если их нет в таблице
+              description: local?.description,
               longDescription: local?.longDescription,
               allergens: local?.allergens,
               volumes: local?.volumes,
-              price: r.price !== undefined ? r.price : (local?.price || 0),
-              // Категория строго из таблицы, если есть
+              // ПРИОРИТЕТ ЦЕНЕ ИЗ ТАБЛИЦЫ
+              price: r.price !== undefined ? Number(r.price) : (local?.price || 0),
               category: r.category || local?.category || 'coffee',
-              // Картинка строго по ID из статики, если есть
-              image: local?.image || r.image || '',
+              image: local?.image || '',
               section: local?.section
             } as MenuItem;
           });
           
+          console.log('Меню успешно обновлено!');
           setMenuItems(newMenuItems);
         }
       }
     } catch (error) {
-      console.error('Failed to load menu:', error);
+      console.error('Ошибка при загрузке меню:', error);
     }
   };
 
