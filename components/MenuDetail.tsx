@@ -1,25 +1,13 @@
 import React, { useState } from 'react';
+import { menuItems } from '../data/menu';
 import { Language, MenuItem } from '../types';
 
 interface MenuDetailProps {
   lang: Language;
   initialCategory?: string;
-  unavailableItems: string[];
-  logEvent: (type: string, details: string) => void;
-  selectedBranch: string | null;
-  onChangeBranch: () => void;
-  items: MenuItem[];
 }
 
-export const MenuDetail: React.FC<MenuDetailProps> = ({ 
-  lang, 
-  initialCategory = 'coffee', 
-  unavailableItems = [], 
-  logEvent,
-  selectedBranch,
-  onChangeBranch,
-  items
-}) => {
+export const MenuDetail: React.FC<MenuDetailProps> = ({ lang, initialCategory = 'coffee' }) => {
   const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -42,8 +30,7 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({
     volume: lang === 'ru' ? 'Объем' : 'Hajmi',
     back: lang === 'ru' ? 'Назад' : 'Orqaga',
     search: lang === 'ru' ? 'Поиск...' : 'Qidirish...',
-    nothingFound: lang === 'ru' ? 'Ничего не найдено' : 'Hech narsa topilmadi',
-    changeBranch: lang === 'ru' ? '(изменить)' : '(o\'zgartirish)'
+    nothingFound: lang === 'ru' ? 'Ничего не найдено' : 'Hech narsa topilmadi'
   };
 
   const categories = [
@@ -56,7 +43,7 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({
     { id: 'dessert', name: t.dessert },
   ];
 
-  const filteredItems = items.filter(item => {
+  const filteredItems = menuItems.filter(item => {
     const query = searchQuery.toLowerCase().trim();
     if (query) {
       // Ищем совпадение в названии блюда
@@ -96,7 +83,6 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({
 
   const handleOpenItem = (item: MenuItem) => {
     window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
-    logEvent('view_item', item.name[lang]);
     setSelectedItem(item);
   };
 
@@ -105,27 +91,10 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({
     setSelectedItem(null);
   };
 
-  const isItemUnavailable = (item: MenuItem) => {
-    // Проверяем наличие по имени (в любом языке для надежности)
-    return unavailableItems.some(unavailable => 
-      unavailable === item.name['ru'] || unavailable === item.name['uz']
-    );
-  };
-
   return (
     <div className="flex flex-col h-full animate-fadeIn relative">
       <div className="sticky top-0 z-10 bg-[#faf9f6] dark:bg-[#121212] pt-4 px-4 shadow-sm border-b border-[#9a644d]/5 dark:border-white/5 transition-colors">
         
-        {/* Branch Selector Button */}
-        {selectedBranch && (
-          <button 
-            onClick={onChangeBranch}
-            className="w-full py-2 bg-[#9a644d]/10 dark:bg-[#b8866b]/10 text-[#9a644d] dark:text-[#b8866b] text-center font-bold text-xs rounded-lg mb-2 uppercase tracking-widest hover:bg-[#9a644d]/20 transition-colors"
-          >
-            📍 {selectedBranch} <span className="opacity-70 normal-case">{t.changeBranch}</span>
-          </button>
-        )}
-
         {/* Search Input */}
         <div className="relative mb-3">
           <input
@@ -186,42 +155,32 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({
         )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredItems.map((item) => {
-            const isUnavailable = isItemUnavailable(item);
-            return (
-              <div 
-                key={item.id} 
-                onClick={() => !isUnavailable && handleOpenItem(item)}
-                className={`bg-white dark:bg-[#1c1c1c] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex min-h-[110px] border border-transparent dark:border-white/5 relative ${isUnavailable ? 'opacity-50 pointer-events-none' : ''}`}
-              >
-                <div className="w-1/3 overflow-hidden relative">
-                  <img 
-                    src={item.image} 
-                    alt={item.name[lang]} 
-                    className="w-full h-full object-cover grayscale-[20%] dark:grayscale-0"
-                  />
-                  {isUnavailable && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
-                      <span className="text-white font-bold text-[10px] md:text-xs bg-red-600/90 px-2 py-1 rounded-md uppercase tracking-wider shadow-sm">
-                        {lang === 'ru' ? 'Закончилось' : 'Tugadi'}
-                      </span>
-                    </div>
+          {filteredItems.map((item) => (
+            <div 
+              key={item.id} 
+              onClick={() => handleOpenItem(item)}
+              className="bg-white dark:bg-[#1c1c1c] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex min-h-[110px] border border-transparent dark:border-white/5"
+            >
+              <div className="w-1/3 overflow-hidden">
+                <img 
+                  src={item.image} 
+                  alt={item.name[lang]} 
+                  className="w-full h-full object-cover grayscale-[20%] dark:grayscale-0"
+                />
+              </div>
+              <div className="w-2/3 p-3 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-semibold text-[#2d2d2d] dark:text-[#f0f0f0] text-base leading-tight">{item.name[lang]}</h3>
+                  {item.description && (
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5 italic">{item.description[lang]}</p>
                   )}
                 </div>
-                <div className="w-2/3 p-3 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-semibold text-[#2d2d2d] dark:text-[#f0f0f0] text-base leading-tight">{item.name[lang]}</h3>
-                    {item.description && (
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5 italic">{item.description[lang]}</p>
-                    )}
-                  </div>
-                  <div className="flex justify-end items-end mt-1">
-                    {renderPrice(item.price)}
-                  </div>
+                <div className="flex justify-end items-end mt-1">
+                  {renderPrice(item.price)}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
 
