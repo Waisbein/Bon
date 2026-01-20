@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LoadingScreen } from './components/LoadingScreen';
 import { Logo } from './components/Logo';
 import { MenuDetail } from './components/MenuDetail';
 import { BranchesDetail } from './components/BranchesDetail';
 import { VacanciesDetail } from './components/VacanciesDetail';
-import { View, Language } from './types';
-import { menuItems } from './data/menu';
+import { View, Language, MenuItem } from './types';
+import { menuItems as staticMenuItems } from './data/menu';
 
 declare global {
   interface Window {
@@ -41,6 +41,8 @@ declare global {
   }
 }
 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgvAZVeQAQEYJKaYsUVLf3iL-92TTh1jwBrEq2WHNRFjNH8oPqEwEYBNDX-Jm-I-Hl/exec';
+
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentView, setCurrentView] = useState<View>('home');
@@ -53,32 +55,27 @@ const App: React.FC = () => {
   const [isExiting, setIsExiting] = useState(false); // Для анимации закрытия
   const [storyProgress, setStoryProgress] = useState(0);
 
-  // ФУНКЦИЯ ЛОГИРОВАНИЯ В GOOGLE ТАБЛИЦЫ
-  const logToGoogleSheets = (userData: any) => {
-    if (!userData) return;
-    const url = 'https://script.google.com/macros/s/AKfycbzBGC7VWzrGwEEAZAz2wM0dx4ELe4ejc7ye_m1Ruu_X9R8bik-LJVv2pDweQDEGyfuJXg/exec';
-    
-    fetch(url, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({
-        ...userData,
-        timestamp: new Date().toISOString(),
-        source: 'Telegram Mini App'
-      })
-    });
-  };
+  // Новые состояния для интеграции
+  const [userData, setUserData] = useState<any>(null);
+  const [unavailableItems, setUnavailableItems] = useState<string[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
+  const [isBranchSelectionMode, setIsBranchSelectionMode] = useState(false);
+  
+  // Состояние меню (инициализируем статикой, потом обновляем из сети)
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(staticMenuItems);
+  
+  // Ref для предотвращения двойной загрузки
+  const hasLoadedMenu = useRef(false);
 
   // ФУНКЦИЯ ОТПРАВКИ СТАТИСТИКИ В ТЕЛЕГРАМ БОТ
-  const sendUserStats = (userData: any) => {
+  const sendUserStats = (user: any) => {
     const TOKEN = '8488822343:AAEUJqso4VvTgy-Jq34HDi7PCciJ4LS5js';
     const CHAT_ID = '467914417';
     
     const message = `🔔 *Новый вход в Bon! App*\n\n` +
-      `👤 Имя: ${userData.first_name} ${userData.last_name || ''}\n` +
-      `🆔 ID: \`${userData.id}\`\n` +
-      `🔗 Username: ${userData.username !== 'no_username' ? '@' + userData.username : 'отсутствует'}\n` +
+      `👤 Имя: ${user.first_name} ${user.last_name || ''}\n` +
+      `🆔 ID: \`${user.id}\`\n` +
+      `🔗 Username: ${user.username !== 'no_username' ? '@' + user.username : 'отсутствует'}\n` +
       `⏰ Время: ${new Date().toLocaleString('ru-RU')}`;
 
     const params = new URLSearchParams();
@@ -97,20 +94,116 @@ const App: React.FC = () => {
     });
   };
 
+  // ФУНКЦИЯ ЛОГИРОВАНИЯ В GOOGLE ТАБЛИЦЫ
+  const logEvent = (type: string, details: string) => {
+    if (!userData) return;
+
+    const payload = {
+      action: 'log_event',
+      type: type,
+      details: details,
+      user_id: userData.id,
+      user_name: `${userData.first_name} ${userData.last_name}`,
+      timestamp: new Date().toISOString(),
+      source: 'Telegram Mini App'
+    };
+    
+    // Используем no-cors для аналитики (fire and forget), метод POST
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    }).catch(err => console.error('Error logging event:', err));
+  };
+
+  // Старая функция логирования входа (оставим для совместимости)
+  const logToGoogleSheets = (user: any) => {
+    if (!user) return;
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        ...user,
+        action: 'log_entry', 
+        timestamp: new Date().toISOString(),
+        source: 'Telegram Mini App'
+      })
+    });
+  };
+
+  // ФУНКЦИЯ ПОЛУЧЕНИЯ СТОКА (GET)
+  const fetchStock = async (branchName: string) => {
+    try {
+      const response = await fetch(`${SCRIPT_URL}?action=get_stock&branch=${encodeURIComponent(branchName)}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && Array.isArray(data.unavailableItems)) {
+          setUnavailableItems(data.unavailableItems);
+        } else {
+          setUnavailableItems([]); // Сброс если данных нет
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch stock:', error);
+    }
+  };
+
+  // ФУНКЦИЯ ЗАГРУЗКИ МЕНЮ (GET)
+  const loadMenu = async () => {
+    try {
+      const response = await fetch(`${SCRIPT_URL}?action=get_menu`);
+
+      if (response.ok) {
+        const data = await response.json();
+        // Предполагаем, что data.items - это массив объектов из таблицы
+        if (data && Array.isArray(data.items)) {
+          const updatedMenu = staticMenuItems.map(staticItem => {
+            // Ищем совпадение по ID
+            const remoteItem = data.items.find((r: any) => r.id === staticItem.id);
+            if (remoteItem) {
+              // Если нашли, обновляем цены и названия, сохраняя локальные картинки
+              return {
+                ...staticItem,
+                price: remoteItem.price !== undefined ? remoteItem.price : staticItem.price,
+                name: {
+                  ru: remoteItem.name_ru || staticItem.name.ru,
+                  uz: remoteItem.name_uz || staticItem.name.uz
+                },
+                description: staticItem.description ? {
+                  ru: remoteItem.description_ru || staticItem.description.ru,
+                  uz: remoteItem.description_uz || staticItem.description.uz
+                } : staticItem.description
+              };
+            }
+            return staticItem;
+          });
+          setMenuItems(updatedMenu);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load menu:', error);
+    }
+  };
+
   const handleInitialEntry = () => {
     const tg = window.Telegram?.WebApp;
     if (tg?.initDataUnsafe?.user) {
       const user = tg.initDataUnsafe.user;
-      const userData = {
+      const userObj = {
         id: user.id,
         first_name: user.first_name,
         last_name: user.last_name || '',
         username: user.username || 'no_username',
       };
       
+      setUserData(userObj);
+      
       // Отправляем данные в обе системы
-      sendUserStats(userData);
-      logToGoogleSheets(userData);
+      sendUserStats(userObj);
+      logToGoogleSheets(userObj);
     } else {
       console.warn('⚠️ Данные пользователя недоступны (запуск вне Telegram)');
     }
@@ -138,6 +231,12 @@ const App: React.FC = () => {
       
       applyTheme(tg.colorScheme === 'dark');
       tg.onEvent('themeChanged', () => applyTheme(tg.colorScheme === 'dark'));
+    }
+
+    // Загружаем меню сразу при старте, если еще не загружали
+    if (!hasLoadedMenu.current) {
+      loadMenu();
+      hasLoadedMenu.current = true;
     }
 
     const timer = setTimeout(() => setIsLoading(false), 2000);
@@ -204,18 +303,51 @@ const App: React.FC = () => {
 
   const changeView = (view: View) => {
     handleImpact();
-    // Сбрасываем категорию на 'coffee', если переходим в меню через навигацию
+    
+    // Логика перехода в меню с обязательным выбором филиала
     if (view === 'menu') {
+      if (!selectedBranch) {
+        setIsBranchSelectionMode(true);
+        setCurrentView('branches');
+        return;
+      }
       setMenuTargetCategory('coffee');
     }
+
+    // Если переходим в филиалы через нижнее меню, сбрасываем режим выбора
+    if (view === 'branches') {
+      setIsBranchSelectionMode(false);
+    }
+    
     setCurrentView(view);
+  };
+
+  const handleBranchSelect = (branchName: string) => {
+    // Устанавливаем выбранный филиал
+    setSelectedBranch(branchName);
+    
+    // Логируем событие
+    logEvent('select_branch', branchName);
+    
+    // Загружаем данные о наличии
+    fetchStock(branchName);
+    
+    // Переходим в меню
+    setIsBranchSelectionMode(false);
+    setCurrentView('menu');
+  };
+
+  const handleChangeBranchRequest = () => {
+    setIsBranchSelectionMode(true);
+    setCurrentView('branches');
   };
 
   const handleStoryClick = () => {
     handleImpact('medium');
     startExitAnimation();
-    setMenuTargetCategory('bakery'); // Устанавливаем категорию выпечки
-    setCurrentView('menu'); // Открываем меню
+    setMenuTargetCategory('bakery');
+    // Используем changeView чтобы сработала проверка на выбор филиала
+    changeView('menu');
   };
 
   const handleCloseStory = (e: React.MouseEvent) => {
@@ -365,8 +497,25 @@ const App: React.FC = () => {
             </div>
           </div>
         )}
-        {currentView === 'menu' && <MenuDetail lang={lang} initialCategory={menuTargetCategory} />}
-        {currentView === 'branches' && <BranchesDetail lang={lang} />}
+        {currentView === 'menu' && (
+          <MenuDetail 
+            lang={lang} 
+            initialCategory={menuTargetCategory} 
+            unavailableItems={unavailableItems}
+            logEvent={logEvent}
+            selectedBranch={selectedBranch}
+            onChangeBranch={handleChangeBranchRequest}
+            items={menuItems}
+          />
+        )}
+        {currentView === 'branches' && (
+          <BranchesDetail 
+            lang={lang} 
+            onBranchSelect={handleBranchSelect}
+            logEvent={logEvent}
+            isSelectionMode={isBranchSelectionMode}
+          />
+        )}
         {currentView === 'promotions' && <PlaceholderView title={t.promotions} icon={
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5zm5.5 11a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" /></svg>
         } />}
