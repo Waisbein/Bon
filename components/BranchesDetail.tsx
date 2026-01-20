@@ -1,23 +1,15 @@
+
 import React from 'react';
 import { branches } from '../data/menu'; // Изменен путь и название
 import { Language, Branch } from '../types';
 
 interface BranchesDetailProps {
   lang: Language;
-  onBranchSelect: (branchName: string) => void;
-  logEvent: (type: string, details: string) => void;
-  isSelectionMode?: boolean;
 }
 
-export const BranchesDetail: React.FC<BranchesDetailProps> = ({ 
-  lang, 
-  onBranchSelect, 
-  logEvent,
-  isSelectionMode = false
-}) => {
+export const BranchesDetail: React.FC<BranchesDetailProps> = ({ lang }) => {
   const t = {
     title: lang === 'ru' ? 'Наши Филиалы' : 'Bizning Filiallar',
-    titleSelect: lang === 'ru' ? 'Выберите филиал' : 'Filialni tanlang',
     regions: lang === 'ru' ? 'Регионы' : 'Viloyatlar',
     tashkent: lang === 'ru' ? 'Ташкент' : 'Toshkent',
     open: lang === 'ru' ? 'ОТКРЫТО' : 'OCHIQ',
@@ -29,25 +21,16 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({
     window.Telegram?.WebApp?.HapticFeedback?.impactOccurred(style);
   };
 
-  const handleBranchClick = (branchName: string) => {
-    handleImpact('light');
-    onBranchSelect(branchName);
-  };
-
-  const openMap = (e: React.MouseEvent, branch: Branch) => {
-    e.stopPropagation();
+  const openMap = (branch: Branch) => {
     handleImpact('medium');
-    logEvent('click_map', branch.name[lang]);
     const searchQuery = `${branch.name[lang]} ${branch.address[lang]}`;
     const url = `https://yandex.uz/maps/?text=${encodeURIComponent(searchQuery)}`;
     window.open(url, '_blank');
   };
 
-  const makeCall = (e: React.MouseEvent, branch: Branch) => {
-    e.stopPropagation();
+  const makeCall = (phone: string) => {
     handleImpact('medium');
-    logEvent('click_call', branch.name[lang]);
-    window.location.href = `tel:${branch.phone.replace(/\s/g, '')}`;
+    window.location.href = `tel:${phone.replace(/\s/g, '')}`;
   };
 
   // Используем branches вместо BRANCHES
@@ -55,11 +38,7 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({
   const regionalBranches = branches.filter(b => b.id.startsWith('r'));
 
   const renderBranchCard = (branch: Branch) => (
-    <div 
-      key={branch.id} 
-      onClick={() => handleBranchClick(branch.name[lang])}
-      className="bg-white dark:bg-[#1c1c1c] p-6 rounded-[1.5rem] shadow-md border border-[#9a644d]/20 dark:border-white/10 transition-colors cursor-pointer hover:shadow-lg active:scale-[0.99] active:bg-[#faf9f6] dark:active:bg-[#252525]"
-    >
+    <div key={branch.id} className="bg-white dark:bg-[#1c1c1c] p-6 rounded-[1.5rem] shadow-md border border-[#9a644d]/20 dark:border-white/10 transition-colors">
       <div className="flex justify-between items-start mb-4">
         <h3 className="font-bold text-xl text-[#3d2721] dark:text-[#f0f0f0] tracking-tight">{branch.name[lang]}</h3>
         <div className="bg-[#e8f5e9] dark:bg-green-900/40 text-[#1b5e20] dark:text-green-300 text-[10px] px-2.5 py-1 rounded-md font-bold uppercase tracking-widest border border-[#1b5e20]/20">
@@ -92,13 +71,13 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({
 
       <div className="flex gap-3">
         <button 
-          onClick={(e) => makeCall(e, branch)}
+          onClick={() => makeCall(branch.phone)}
           className="flex-1 bg-[#845642] dark:bg-[#9a644d] text-white py-4 rounded-xl text-sm font-black shadow-lg shadow-[#845642]/20 transition-all active:scale-[0.97]"
         >
           {t.call}
         </button>
         <button 
-          onClick={(e) => openMap(e, branch)}
+          onClick={() => openMap(branch)}
           className="flex-1 bg-white dark:bg-[#2a2a2a] border-2 border-[#845642] dark:border-[#9a644d] text-[#845642] dark:text-[#b8866b] py-4 rounded-xl text-sm font-black transition-all active:scale-[0.97]"
         >
           {t.map}
@@ -109,14 +88,6 @@ export const BranchesDetail: React.FC<BranchesDetailProps> = ({
 
   return (
     <div className="p-4 animate-fadeIn pb-32 space-y-12">
-      {isSelectionMode && (
-        <div className="text-center py-2">
-          <p className="text-[#9a644d] dark:text-[#b8866b] font-bold text-lg animate-pulse">
-            {t.titleSelect}
-          </p>
-        </div>
-      )}
-
       <section>
         <h2 className="text-2xl font-serif text-[#3d2721] dark:text-[#b8866b] mb-6 flex items-center gap-4 px-1">
           <span className="whitespace-nowrap font-bold uppercase tracking-wider">{t.tashkent}</span>
