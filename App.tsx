@@ -151,49 +151,57 @@ const App: React.FC = () => {
     }
   };
 
-  // ФУНКЦИЯ ЗАГРУЗКИ МЕНЮ (GET) — ИСПРАВЛЕННАЯ
+ // ФУНКЦИЯ ЗАГРУЗКИ МЕНЮ — ТЕПЕРЬ С АЛЕРТАМИ ДЛЯ ПРОВЕРКИ
   const loadMenu = async () => {
     try {
-      console.log('Запрашиваю меню из таблицы...');
+      // Это окно должно появиться первым
+      alert('Начинаю загрузку меню из Google...'); 
+      
       const response = await fetch(`${SCRIPT_URL}?action=get_menu`);
+      const data = await response.json();
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Данные из таблицы получены:', data);
+      // Это окно покажет, что именно прилетело из таблицы
+      alert('Данные получены! Количество товаров: ' + (Array.isArray(data) ? data.length : 'не массив'));
 
-        // Проверяем, что пришел массив
-        if (data && Array.isArray(data)) {
-          const newMenuItems = data.map((r: any) => {
-            // Ищем локальный товар для картинки и описания
-            const local = staticMenuItems.find(s => s.id === String(r.id));
-            
-            return {
-              id: String(r.id),
-              name: {
-                // Берем из таблицы (структура name.ru), если нет — из кода
-                ru: r.name?.ru || local?.name.ru || '',
-                uz: r.name?.uz || local?.name.uz || ''
-              },
-              description: local?.description,
-              longDescription: local?.longDescription,
-              allergens: local?.allergens,
-              volumes: local?.volumes,
-              // ПРИОРИТЕТ ЦЕНЕ ИЗ ТАБЛИЦЫ
-              price: r.price !== undefined ? Number(r.price) : (local?.price || 0),
-              category: r.category || local?.category || 'coffee',
-              image: local?.image || '',
-              section: local?.section
-            } as MenuItem;
-          });
-          
-          console.log('Меню успешно обновлено!');
-          setMenuItems(newMenuItems);
-        }
+      if (data && Array.isArray(data)) {
+        const newMenuItems = data.map((r: any) => {
+          const local = staticMenuItems.find(s => String(s.id) === String(r.id));
+          return {
+            ...local, // Берем все из кода (картинку, описание)
+            id: String(r.id),
+            name: {
+              ru: r.name?.ru || local?.name.ru || '',
+              uz: r.name?.uz || local?.name.uz || ''
+            },
+            price: r.price !== undefined ? Number(r.price) : (local?.price || 0),
+            category: r.category || local?.category || 'coffee',
+          } as MenuItem;
+        });
+        
+        setMenuItems(newMenuItems);
+        alert('Меню в приложении обновлено! Проверь цену.');
       }
-    } catch (error) {
-      console.error('Ошибка при загрузке меню:', error);
+    } catch (error: any) {
+      alert('ОШИБКА ЗАГРУЗКИ: ' + error.message);
     }
   };
+
+  // Исправь также useEffect внизу, чтобы он точно сработал
+  useEffect(() => {
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      handleInitialEntry();
+      applyTheme(tg.colorScheme === 'dark');
+    }
+
+    // Убираем проверку useRef на время теста, чтобы грузилось всегда
+    loadMenu();
+
+    const timer = setTimeout(() => setIsLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleInitialEntry = () => {
     const tg = window.Telegram?.WebApp;
