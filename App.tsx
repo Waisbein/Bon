@@ -323,7 +323,7 @@ const App: React.FC = () => {
           <div className="min-h-screen flex flex-col justify-between p-8 bg-gradient-to-b from-[#faf9f6] to-white dark:from-[#121212] dark:to-[#1a1a1a] animate-fadeIn">
             
             <div className="flex-1 flex flex-col items-center justify-center space-y-10">
-              <div className="transform scale-125 transition-transform duration-1000 mt-4"><Logo className="w-full" /></div>
+              
             </div>
             
             <div className="w-full max-w-[320px] mx-auto space-y-4 mb-2">
