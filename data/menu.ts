@@ -6,6 +6,7 @@ const IMG_BASE = '/menu';
 
 export const menuItems: MenuItem[] = [
   ${newItemString},
+  ${newItemString},
   // 1. НОВИНКИ
   {
     id: `news-1`,
