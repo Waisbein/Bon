@@ -10,6 +10,7 @@ export const menuItems: MenuItem[] = [
   ${newItemString},
   ${newItemString},
   ${newItemString},
+  ${newItemString},
   // 1. НОВИНКИ
   {
     id: `news-1`,
