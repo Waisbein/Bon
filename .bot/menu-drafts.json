@@ -1,19 +1,5 @@
 {
-  "sessions": {
-    "467914417": {
-      "step": "await_section",
-      "draft": {
-        "id": "d-1772720931876-9222",
-        "createdAt": "2026-03-05T14:28:51.876Z",
-        "createdBy": 467914417,
-        "status": "draft",
-        "photoFileId": "AgACAgIAAxkBAAMmaamTPf6UBvHEbiuVBbJlvdvaiTMAAkQZaxsnUVBJahgFIfAoaXIBAAMCAANtAAM6BA",
-        "nameRu": "Салат Цезарь",
-        "price": 63000,
-        "descriptionRu": "Куриное филе, салат айсберг,томаты черри, маслины, яйца, хлеб \"Бриошь\", пармезан. Подается под соусом \"Цезарь\""
-      }
-    }
-  },
+  "sessions": {},
   "drafts": [
     {
       "id": "d-1772720181096-2030",
@@ -30,6 +16,19 @@
       "publishedAt": "2026-03-05T14:18:37.537Z",
       "publishedMenuItemId": "admin-d-1772720181096-2030",
       "image": "/menu/uploads/d-1772720181096-2030.jpg"
+    },
+    {
+      "id": "d-1772720931876-9222",
+      "createdAt": "2026-03-05T14:28:51.876Z",
+      "createdBy": 467914417,
+      "status": "draft",
+      "photoFileId": "AgACAgIAAxkBAAMmaamTPf6UBvHEbiuVBbJlvdvaiTMAAkQZaxsnUVBJahgFIfAoaXIBAAMCAANtAAM6BA",
+      "nameRu": "Салат Цезарь",
+      "price": 63000,
+      "descriptionRu": "Куриное филе, салат айсберг,томаты черри, маслины, яйца, хлеб \"Бриошь\", пармезан. Подается под соусом \"Цезарь\"",
+      "category": "dessert",
+      "sectionTitle": "Десерты",
+      "updatedAt": "2026-03-05T14:32:57.842Z"
     }
   ]
 }
