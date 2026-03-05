@@ -1,7 +1,7 @@
 {
   "sessions": {
     "467914417": {
-      "step": "await_description",
+      "step": "await_section",
       "draft": {
         "id": "d-1772720181096-2030",
         "createdAt": "2026-03-05T14:16:21.097Z",
@@ -9,7 +9,8 @@
         "status": "draft",
         "photoFileId": "AgACAgIAAxkBAAMTaamQZh8U1aQntF5knfMJwoYH0dIAAioZaxsnUVBJIAaMIl4ssE0BAAMCAANtAAM6BA",
         "nameRu": "Чечевичный суп",
-        "price": 24000
+        "price": 24000,
+        "descriptionRu": "Чечевица. Роскошная."
       }
     }
   },
