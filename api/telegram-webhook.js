@@ -31,6 +31,7 @@ const MAIN_KEYBOARD = {
   ],
   resize_keyboard: true,
 };
+const isWhisperEnabled = Boolean(CONFIG.openaiApiKey);
 
 const chunk = (items, size) => {
   const result = [];
@@ -283,6 +284,48 @@ const getExtension = (filePath) => {
   return match ? match[1].toLowerCase() : 'jpg';
 };
 
+const getAudioMimeType = (extension) => {
+  if (extension === 'ogg' || extension === 'oga') return 'audio/ogg';
+  if (extension === 'mp3') return 'audio/mpeg';
+  if (extension === 'm4a') return 'audio/mp4';
+  if (extension === 'wav') return 'audio/wav';
+  return 'application/octet-stream';
+};
+
+const extractTranscribableAudioFileId = (message) => {
+  if (message?.voice?.file_id) return message.voice.file_id;
+  if (message?.audio?.file_id) return message.audio.file_id;
+  return null;
+};
+
+const transcribeAudioWithWhisper = async (audioFileId) => {
+  if (!isWhisperEnabled || !audioFileId) return null;
+
+  const audioFile = await getTelegramFile(CONFIG.telegramBotToken, audioFileId);
+  const extension = getExtension(audioFile.filePath);
+  const mimeType = getAudioMimeType(extension);
+
+  const formData = new FormData();
+  formData.append('model', CONFIG.openaiTranscriptionModel);
+  formData.append('file', new Blob([audioFile.bytes], { type: mimeType }), `voice.${extension}`);
+
+  const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${CONFIG.openaiApiKey}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Whisper transcription failed (${response.status})`);
+  }
+
+  const payload = await response.json();
+  const text = String(payload?.text || '').trim();
+  return text || null;
+};
+
 const uploadDraftImageToGithub = async (draft) => {
   const telegramImage = await getTelegramFile(CONFIG.telegramBotToken, draft.photoFileId);
   const ext = getExtension(telegramImage.filePath);
@@ -377,7 +420,7 @@ const handleCommand = async ({ chatId, userId, text, state, stateSha }) => {
     await sendTelegramMessage(
       CONFIG.telegramBotToken,
       chatId,
-      'Админ-бот меню готов. Команды:\n/new - создать черновик\n/drafts - список черновиков\n<code>/publish ID</code> - опубликовать\n/cancel - отменить текущий ввод\n\nНа шаге раздела можно ввести новый раздел текстом.',
+      `Админ-бот меню готов. Команды:\n/new - создать черновик\n/drafts - список черновиков\n<code>/publish ID</code> - опубликовать\n/cancel - отменить текущий ввод\n\nНа шаге раздела можно ввести новый раздел текстом.${isWhisperEnabled ? '\nНа шаге описания доступно голосовое (Whisper).' : ''}`,
       { reply_markup: MAIN_KEYBOARD }
     );
     return stateSha;
@@ -534,16 +577,45 @@ const handleSessionStep = async ({ chatId, userId, message, state, stateSha }) =
     await sendTelegramMessage(
       CONFIG.telegramBotToken,
       chatId,
-      'Шаг 4/5: отправьте описание/состав текстом.'
+      isWhisperEnabled
+        ? 'Шаг 4/5: отправьте описание/состав текстом или голосовым.'
+        : 'Шаг 4/5: отправьте описание/состав текстом.'
     );
     return nextSha;
   }
 
   if (session.step === 'await_description') {
-    const description = String(message.text || '').trim();
+    let description = String(message.text || '').trim();
+    const audioFileId = extractTranscribableAudioFileId(message);
+
+    if (!description && audioFileId) {
+      if (!isWhisperEnabled) {
+        await sendTelegramMessage(
+          CONFIG.telegramBotToken,
+          chatId,
+          'Голосовой ввод сейчас отключен. Отправьте описание текстом.'
+        );
+        return stateSha;
+      }
+
+      try {
+        description = await transcribeAudioWithWhisper(audioFileId);
+      } catch {
+        await sendTelegramMessage(
+          CONFIG.telegramBotToken,
+          chatId,
+          'Не удалось распознать голосовое. Попробуйте еще раз или отправьте описание текстом.'
+        );
+        return stateSha;
+      }
+    }
 
     if (!description) {
-      await sendTelegramMessage(CONFIG.telegramBotToken, chatId, 'Нужно описание текстом.');
+      await sendTelegramMessage(
+        CONFIG.telegramBotToken,
+        chatId,
+        isWhisperEnabled ? 'Нужно описание текстом или голосовым.' : 'Нужно описание текстом.'
+      );
       return stateSha;
     }
 

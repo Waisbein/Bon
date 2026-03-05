@@ -23,6 +23,9 @@ export const CONFIG = {
   botStatePath: process.env.BOT_STATE_PATH || '.bot/menu-drafts.json',
   menuDataPath: process.env.MENU_DATA_PATH || 'public/menu/admin-items.json',
   menuUploadDir: process.env.MENU_UPLOAD_DIR || 'public/menu/uploads',
+
+  openaiApiKey: process.env.OPENAI_API_KEY || '',
+  openaiTranscriptionModel: process.env.OPENAI_TRANSCRIPTION_MODEL || 'whisper-1',
 };
 
 export const validateRuntimeConfig = () => {

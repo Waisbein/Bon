@@ -44,6 +44,8 @@ Create these variables in Vercel Project Settings (copy names from `.env.example
 
 Optional:
 
+- `OPENAI_API_KEY` to enable voice description input (Whisper)
+- `OPENAI_TRANSCRIPTION_MODEL` (default: `whisper-1`)
 - `GITHUB_DRAFT_BRANCH` if you want drafts/state in a separate branch
 
 ### 2. Register webhook once
@@ -58,7 +60,7 @@ Example:
 
 ### 3. Bot commands (admin only)
 
-- `/new` - create draft in 5 steps (photo -> name -> price -> description -> section)
+- `/new` - create draft in 5 steps (photo -> name -> price -> description (text or voice if enabled) -> section)
 - `/drafts` - list saved drafts
 - `/publish <id>` - publish selected draft to live menu
 - `/cancel` - cancel active flow
