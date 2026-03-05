@@ -1,7 +1,7 @@
 {
   "sessions": {
     "467914417": {
-      "step": "await_description",
+      "step": "await_section",
       "draft": {
         "id": "d-1772720931876-9222",
         "createdAt": "2026-03-05T14:28:51.876Z",
@@ -9,7 +9,8 @@
         "status": "draft",
         "photoFileId": "AgACAgIAAxkBAAMmaamTPf6UBvHEbiuVBbJlvdvaiTMAAkQZaxsnUVBJahgFIfAoaXIBAAMCAANtAAM6BA",
         "nameRu": "Салат Цезарь",
-        "price": 63000
+        "price": 63000,
+        "descriptionRu": "Куриное филе, салат айсберг,томаты черри, маслины, яйца, хлеб \"Бриошь\", пармезан. Подается под соусом \"Цезарь\""
       }
     }
   },
