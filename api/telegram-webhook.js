@@ -259,7 +259,7 @@ const handleCommand = async ({ chatId, userId, text, state, stateSha }) => {
     await sendTelegramMessage(
       CONFIG.telegramBotToken,
       chatId,
-      'Админ-бот меню готов. Команды:\n/new - создать черновик\n/drafts - список черновиков\n/publish <id> - опубликовать\n/cancel - отменить текущий ввод',
+      'Админ-бот меню готов. Команды:\n/new - создать черновик\n/drafts - список черновиков\n<code>/publish ID</code> - опубликовать\n/cancel - отменить текущий ввод',
       { reply_markup: MAIN_KEYBOARD }
     );
     return stateSha;
@@ -353,7 +353,7 @@ const handleCommand = async ({ chatId, userId, text, state, stateSha }) => {
   await sendTelegramMessage(
     CONFIG.telegramBotToken,
     chatId,
-    'Неизвестная команда. Используйте /new, /drafts, /publish <id>, /cancel.',
+    'Неизвестная команда. Используйте /new, /drafts, <code>/publish ID</code>, /cancel.',
     { reply_markup: MAIN_KEYBOARD }
   );
 
