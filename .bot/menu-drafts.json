@@ -5,14 +5,17 @@
       "id": "d-1772720181096-2030",
       "createdAt": "2026-03-05T14:16:21.097Z",
       "createdBy": 467914417,
-      "status": "draft",
+      "status": "published",
       "photoFileId": "AgACAgIAAxkBAAMTaamQZh8U1aQntF5knfMJwoYH0dIAAioZaxsnUVBJIAaMIl4ssE0BAAMCAANtAAM6BA",
       "nameRu": "Чечевичный суп",
       "price": 24000,
       "descriptionRu": "Чечевица. Роскошная.",
       "category": "news",
       "sectionTitle": "Новинки",
-      "updatedAt": "2026-03-05T14:18:07.074Z"
+      "updatedAt": "2026-03-05T14:18:07.074Z",
+      "publishedAt": "2026-03-05T14:18:37.537Z",
+      "publishedMenuItemId": "admin-d-1772720181096-2030",
+      "image": "/menu/uploads/d-1772720181096-2030.jpg"
     }
   ]
 }
