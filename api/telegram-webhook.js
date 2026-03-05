@@ -22,6 +22,7 @@ const SECTION_OPTIONS = [
   { key: 'bakery', titleRu: 'Выпечка' },
   { key: 'dessert', titleRu: 'Десерты' },
 ];
+const BUILTIN_SECTION_KEYS = new Set(SECTION_OPTIONS.map((option) => option.key));
 
 const MAIN_KEYBOARD = {
   keyboard: [
@@ -58,6 +59,13 @@ const createDraftId = () => {
 };
 
 const normalize = (value) => String(value || '').trim().toLowerCase();
+const canonicalizeSectionTitle = (value) => {
+  return normalize(value)
+    .replace(/ё/g, 'е')
+    .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
 
 const escapeHtml = (value) => {
   return String(value || '')
@@ -69,7 +77,7 @@ const escapeHtml = (value) => {
 };
 
 const buildCustomSectionKey = (sectionTitle) => {
-  const normalizedTitle = normalize(sectionTitle);
+  const normalizedTitle = canonicalizeSectionTitle(sectionTitle);
   if (!normalizedTitle) return null;
 
   const encoded = encodeURIComponent(normalizedTitle)
@@ -81,21 +89,116 @@ const buildCustomSectionKey = (sectionTitle) => {
   return `custom-${encoded}`;
 };
 
-const resolveSection = (rawInput) => {
+const addKnownSection = (knownByKey, key, titleRu) => {
+  const safeKey = String(key || '').trim();
+  const safeTitle = String(titleRu || '').trim();
+  if (!safeKey || !safeTitle) return;
+  if (knownByKey.has(safeKey)) return;
+  knownByKey.set(safeKey, {
+    key: safeKey,
+    titleRu: safeTitle,
+    isCustom: !BUILTIN_SECTION_KEYS.has(safeKey),
+  });
+};
+
+const getKnownSections = async (state) => {
+  const knownByKey = new Map();
+
+  SECTION_OPTIONS.forEach((option) => addKnownSection(knownByKey, option.key, option.titleRu));
+
+  const stateDrafts = Array.isArray(state?.drafts) ? state.drafts : [];
+  stateDrafts.forEach((draft) => {
+    addKnownSection(knownByKey, draft?.category, draft?.sectionTitle || draft?.category);
+  });
+
+  try {
+    const menuDataFile = await readJsonFile({
+      token: CONFIG.githubToken,
+      owner: CONFIG.githubRepoOwner,
+      repo: CONFIG.githubRepoName,
+      path: CONFIG.menuDataPath,
+      branch: CONFIG.githubTargetBranch,
+      fallbackValue: [],
+    });
+
+    const existingItems = Array.isArray(menuDataFile.value) ? menuDataFile.value : [];
+    existingItems.forEach((item) => {
+      addKnownSection(knownByKey, item?.category, item?.section || item?.category);
+    });
+  } catch {
+    // Если чтение меню временно недоступно, продолжаем с уже известными разделами.
+  }
+
+  return Array.from(knownByKey.values());
+};
+
+const levenshteinDistance = (left, right) => {
+  if (left === right) return 0;
+  if (!left) return right.length;
+  if (!right) return left.length;
+
+  const rows = left.length + 1;
+  const cols = right.length + 1;
+  const matrix = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+  for (let i = 0; i < rows; i += 1) matrix[i][0] = i;
+  for (let j = 0; j < cols; j += 1) matrix[0][j] = j;
+
+  for (let i = 1; i < rows; i += 1) {
+    for (let j = 1; j < cols; j += 1) {
+      const cost = left[i - 1] === right[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      );
+    }
+  }
+
+  return matrix[rows - 1][cols - 1];
+};
+
+const findLikelyExistingSection = (inputCanonical, knownSections) => {
+  if (!inputCanonical || inputCanonical.length < 6) return null;
+
+  let bestMatch = null;
+  for (const section of knownSections) {
+    const candidateCanonical = canonicalizeSectionTitle(section.titleRu);
+    if (!candidateCanonical || candidateCanonical === inputCanonical) continue;
+
+    const distance = levenshteinDistance(inputCanonical, candidateCanonical);
+    const maxLen = Math.max(inputCanonical.length, candidateCanonical.length);
+    const similarity = 1 - distance / maxLen;
+    const probablyTypo = distance <= 1 || (distance <= 2 && similarity >= 0.9);
+
+    if (!probablyTypo) continue;
+    if (!bestMatch || similarity > bestMatch.similarity || (similarity === bestMatch.similarity && distance < bestMatch.distance)) {
+      bestMatch = { section, distance, similarity };
+    }
+  }
+
+  return bestMatch ? bestMatch.section : null;
+};
+
+const resolveSection = (rawInput, knownSections) => {
   const rawValue = String(rawInput || '').trim();
   const input = normalize(rawValue);
+  const canonicalInput = canonicalizeSectionTitle(rawValue);
   if (!input) return null;
 
-  const direct = SECTION_OPTIONS.find((option) => option.key === input);
-  if (direct) return { ...direct, isCustom: false };
+  const byKey = knownSections.find((section) => normalize(section.key) === input);
+  if (byKey) return { ...byKey, matchedByTypo: false };
 
-  const byTitle = SECTION_OPTIONS.find((option) => normalize(option.titleRu) === input);
-  if (byTitle) return { ...byTitle, isCustom: false };
+  const byExactTitle = knownSections.find((section) => canonicalizeSectionTitle(section.titleRu) === canonicalInput);
+  if (byExactTitle) return { ...byExactTitle, matchedByTypo: false };
+
+  const byTypo = findLikelyExistingSection(canonicalInput, knownSections);
+  if (byTypo) return { ...byTypo, matchedByTypo: true };
 
   const customKey = buildCustomSectionKey(rawValue);
   if (!customKey) return null;
 
-  return { key: customKey, titleRu: rawValue, isCustom: true };
+  return { key: customKey, titleRu: canonicalInput ? rawValue.replace(/\s+/g, ' ').trim() : rawValue, isCustom: true, matchedByTypo: false };
 };
 
 const formatDraftLine = (draft) => {
@@ -438,7 +541,8 @@ const handleSessionStep = async ({ chatId, userId, message, state, stateSha }) =
   }
 
   if (session.step === 'await_section') {
-    const chosen = resolveSection(message.text);
+    const knownSections = await getKnownSections(state);
+    const chosen = resolveSection(message.text, knownSections);
     if (!chosen) {
       await sendTelegramMessage(CONFIG.telegramBotToken, chatId, 'Раздел не распознан. Выберите кнопку или введите название нового раздела.', {
         reply_markup: SECTION_KEYBOARD,
@@ -448,6 +552,14 @@ const handleSessionStep = async ({ chatId, userId, message, state, stateSha }) =
 
     session.draft.category = chosen.key;
     session.draft.sectionTitle = chosen.titleRu;
+
+    if (chosen.matchedByTypo) {
+      await sendTelegramMessage(
+        CONFIG.telegramBotToken,
+        chatId,
+        `Чтобы не создать дубль, использую существующий раздел: <b>${escapeHtml(chosen.titleRu)}</b>.`
+      );
+    }
 
     const finalizedDraft = {
       ...session.draft,
