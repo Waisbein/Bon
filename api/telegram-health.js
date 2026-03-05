@@ -1,4 +1,5 @@
 import { CONFIG, validateRuntimeConfig } from './_lib/config.js';
+import { readJsonFile } from './_lib/github.js';
 
 const fetchTelegram = async (method, token) => {
   const response = await fetch(`https://api.telegram.org/bot${token}/${method}`);
@@ -18,9 +19,37 @@ export default async function handler(req, res) {
 
     let getMe = null;
     let webhookInfo = null;
+    let github = null;
     if (hasToken) {
       getMe = await fetchTelegram('getMe', CONFIG.telegramBotToken);
       webhookInfo = await fetchTelegram('getWebhookInfo', CONFIG.telegramBotToken);
+    }
+
+    try {
+      const state = await readJsonFile({
+        token: CONFIG.githubToken,
+        owner: CONFIG.githubRepoOwner,
+        repo: CONFIG.githubRepoName,
+        path: CONFIG.botStatePath,
+        branch: CONFIG.githubDraftBranch,
+        fallbackValue: { sessions: {}, drafts: [] },
+      });
+
+      github = {
+        ok: true,
+        repo: `${CONFIG.githubRepoOwner}/${CONFIG.githubRepoName}`,
+        branch: CONFIG.githubDraftBranch,
+        stateFilePath: CONFIG.botStatePath,
+        stateFileSha: state.sha || null,
+      };
+    } catch (error) {
+      github = {
+        ok: false,
+        repo: `${CONFIG.githubRepoOwner}/${CONFIG.githubRepoName}`,
+        branch: CONFIG.githubDraftBranch,
+        stateFilePath: CONFIG.botStatePath,
+        error: error.message || 'Unknown GitHub error',
+      };
     }
 
     res.status(200).json({
@@ -36,6 +65,7 @@ export default async function handler(req, res) {
         getMe,
         webhookInfo,
       },
+      github,
     });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message || 'Unexpected error' });
