@@ -1,4 +1,14 @@
 {
-  "sessions": {},
+  "sessions": {
+    "467914417": {
+      "step": "await_photo",
+      "draft": {
+        "id": "d-1772720181096-2030",
+        "createdAt": "2026-03-05T14:16:21.097Z",
+        "createdBy": 467914417,
+        "status": "draft"
+      }
+    }
+  },
   "drafts": []
 }
