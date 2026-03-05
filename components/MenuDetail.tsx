@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { menuItems } from '../data/menu';
 import { Language, MenuItem } from '../types';
 
@@ -11,6 +11,7 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang, initialCategory = 
   const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [adminItems, setAdminItems] = useState<MenuItem[]>([]);
 
   const t = {
     title: lang === 'ru' ? 'Наше Меню' : 'Bizning Menyu',
@@ -43,7 +44,39 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang, initialCategory = 
     { id: 'dessert', name: t.dessert },
   ];
 
-  const filteredItems = menuItems.filter(item => {
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadAdminItems = async () => {
+      try {
+        const response = await fetch('/menu/admin-items.json', { cache: 'no-store' });
+        if (!response.ok) return;
+        const payload = await response.json();
+        if (!Array.isArray(payload)) return;
+
+        const safeItems = payload.filter((item) => {
+          return item && typeof item.id === 'string' && typeof item.category === 'string' && item.name && item.image;
+        }) as MenuItem[];
+
+        if (isMounted) {
+          setAdminItems(safeItems);
+        }
+      } catch {
+        // Файл с админскими позициями может отсутствовать на раннем этапе — это допустимо.
+      }
+    };
+
+    loadAdminItems();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const allMenuItems = useMemo(() => {
+    return [...menuItems, ...adminItems];
+  }, [adminItems]);
+
+  const filteredItems = allMenuItems.filter(item => {
     const query = searchQuery.toLowerCase().trim();
     if (query) {
       // Ищем совпадение в названии блюда

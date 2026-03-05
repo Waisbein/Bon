@@ -5,12 +5,6 @@ const NEWS_FOLDER = "1.%D0%9D%D0%BE%D0%B2%D0%B8%D0%BD%D0%BA%D0%B8";
 const IMG_BASE = '/menu';
 
 export const menuItems: MenuItem[] = [
-  ${newItemString},
-  ${newItemString},
-  ${newItemString},
-  ${newItemString},
-  ${newItemString},
-  ${newItemString},
   // 1. НОВИНКИ
   {
     id: `news-1`,
