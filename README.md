@@ -44,7 +44,6 @@ Create these variables in Vercel Project Settings (copy names from `.env.example
 
 Optional:
 
-- `OPENAI_API_KEY` for voice transcription
 - `GITHUB_DRAFT_BRANCH` if you want drafts/state in a separate branch
 
 ### 2. Register webhook once

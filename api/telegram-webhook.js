@@ -158,33 +158,6 @@ const getExtension = (filePath) => {
   return match ? match[1].toLowerCase() : 'jpg';
 };
 
-const transcriptVoice = async (voiceFileId) => {
-  if (!CONFIG.openaiApiKey) return null;
-
-  const voiceFile = await getTelegramFile(CONFIG.telegramBotToken, voiceFileId);
-  const ext = getExtension(voiceFile.filePath);
-
-  const formData = new FormData();
-  formData.append('model', CONFIG.openaiTranscriptionModel);
-  formData.append('file', new Blob([voiceFile.bytes], { type: 'audio/ogg' }), `voice.${ext}`);
-
-  const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${CONFIG.openaiApiKey}`,
-    },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(`OpenAI transcription failed (${response.status})`);
-  }
-
-  const data = await response.json();
-  const text = String(data?.text || '').trim();
-  return text || null;
-};
-
 const uploadDraftImageToGithub = async (draft) => {
   const telegramImage = await getTelegramFile(CONFIG.telegramBotToken, draft.photoFileId);
   const ext = getExtension(telegramImage.filePath);
@@ -436,47 +409,16 @@ const handleSessionStep = async ({ chatId, userId, message, state, stateSha }) =
     await sendTelegramMessage(
       CONFIG.telegramBotToken,
       chatId,
-      'Шаг 4/5: отправьте описание/состав текстом. Можно голосовым, если задан OPENAI_API_KEY.'
+      'Шаг 4/5: отправьте описание/состав текстом.'
     );
     return nextSha;
   }
 
   if (session.step === 'await_description') {
-    let description = String(message.text || '').trim();
-
-    if (!description && message.voice?.file_id) {
-      if (!CONFIG.openaiApiKey) {
-        await sendTelegramMessage(
-          CONFIG.telegramBotToken,
-          chatId,
-          'Для голосовых пока не задан OPENAI_API_KEY. Отправьте описание обычным текстом.'
-        );
-        return stateSha;
-      }
-
-      try {
-        description = await transcriptVoice(message.voice.file_id);
-      } catch (error) {
-        await sendTelegramMessage(
-          CONFIG.telegramBotToken,
-          chatId,
-          `Голос не распознан: ${error.message}. Отправьте описание текстом.`
-        );
-        return stateSha;
-      }
-
-      if (!description) {
-        await sendTelegramMessage(
-          CONFIG.telegramBotToken,
-          chatId,
-          'Голос получен, но текст пустой. Отправьте описание обычным текстом.'
-        );
-        return stateSha;
-      }
-    }
+    const description = String(message.text || '').trim();
 
     if (!description) {
-      await sendTelegramMessage(CONFIG.telegramBotToken, chatId, 'Нужно описание: текстом или голосом.');
+      await sendTelegramMessage(CONFIG.telegramBotToken, chatId, 'Нужно описание текстом.');
       return stateSha;
     }
 
