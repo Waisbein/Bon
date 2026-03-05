@@ -343,7 +343,7 @@ const handleCommand = async ({ chatId, userId, text, state, stateSha }) => {
     await sendTelegramMessage(
       CONFIG.telegramBotToken,
       chatId,
-      `Готово: ${draftId} опубликован как <code>${publishResult.menuItemId}</code>.\nVercel запустит автодеплой.`,
+      `✅ Блюдо добавлено в меню.\nПозиция: <code>${publishResult.menuItemId}</code>\nСтатус: данные опубликованы, Vercel обновляет сайт.`,
       { reply_markup: MAIN_KEYBOARD }
     );
 
