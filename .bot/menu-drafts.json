@@ -1,7 +1,7 @@
 {
   "sessions": {
     "467914417": {
-      "step": "await_description",
+      "step": "await_section",
       "draft": {
         "id": "d-1772721402654-1695",
         "createdAt": "2026-03-05T14:36:42.654Z",
@@ -9,7 +9,8 @@
         "status": "draft",
         "photoFileId": "AgACAgIAAxkBAANDaamVKpf0BjmzZVGHkNFPx9nZmGkAAlsZaxsnUVBJPXXv44FvbSsBAAMCAANtAAM6BA",
         "nameRu": "Салат греческий",
-        "price": 45000
+        "price": 45000,
+        "descriptionRu": "Фета, маслины, лимон, свежие овощи (огурец, томаты, болгарский перец), салат айсберг, орегано. Подается под оливковым маслом"
       }
     }
   },
