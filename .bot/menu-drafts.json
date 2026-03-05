@@ -1,14 +1,15 @@
 {
   "sessions": {
     "467914417": {
-      "step": "await_price",
+      "step": "await_description",
       "draft": {
         "id": "d-1772720074977-5224",
         "createdAt": "2026-03-05T14:14:34.977Z",
         "createdBy": 467914417,
         "status": "draft",
         "photoFileId": "AgACAgIAAxkBAAMHaamP6FUXeO4umunaBzBYbQVWHp8AAiUZaxsnUVBJrhZWFti6d7wBAAMCAAN4AAM6BA",
-        "nameRu": "Блины. с хреном"
+        "nameRu": "Блины. с хреном",
+        "price": 24000
       }
     }
   },
