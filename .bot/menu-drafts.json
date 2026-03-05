@@ -1,12 +1,13 @@
 {
   "sessions": {
     "467914417": {
-      "step": "await_photo",
+      "step": "await_name",
       "draft": {
         "id": "d-1772721402654-1695",
         "createdAt": "2026-03-05T14:36:42.654Z",
         "createdBy": 467914417,
-        "status": "draft"
+        "status": "draft",
+        "photoFileId": "AgACAgIAAxkBAANDaamVKpf0BjmzZVGHkNFPx9nZmGkAAlsZaxsnUVBJPXXv44FvbSsBAAMCAANtAAM6BA"
       }
     }
   },
