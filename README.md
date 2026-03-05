@@ -64,4 +64,6 @@ Example:
 - `/publish <id>` - publish selected draft to live menu
 - `/cancel` - cancel active flow
 
+At step 5 you can either pick an existing section from keyboard or type a brand-new section name.
+
 On publish, Vercel autodeploy will update the menu automatically.

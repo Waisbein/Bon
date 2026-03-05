@@ -68,14 +68,34 @@ const escapeHtml = (value) => {
     .replace(/'/g, '&#39;');
 };
 
-const detectSection = (rawInput) => {
-  const input = normalize(rawInput);
+const buildCustomSectionKey = (sectionTitle) => {
+  const normalizedTitle = normalize(sectionTitle);
+  if (!normalizedTitle) return null;
+
+  const encoded = encodeURIComponent(normalizedTitle)
+    .replace(/%/g, '')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .slice(0, 48);
+
+  if (!encoded) return null;
+  return `custom-${encoded}`;
+};
+
+const resolveSection = (rawInput) => {
+  const rawValue = String(rawInput || '').trim();
+  const input = normalize(rawValue);
   if (!input) return null;
 
   const direct = SECTION_OPTIONS.find((option) => option.key === input);
-  if (direct) return direct;
+  if (direct) return { ...direct, isCustom: false };
 
-  return SECTION_OPTIONS.find((option) => normalize(option.titleRu) === input) || null;
+  const byTitle = SECTION_OPTIONS.find((option) => normalize(option.titleRu) === input);
+  if (byTitle) return { ...byTitle, isCustom: false };
+
+  const customKey = buildCustomSectionKey(rawValue);
+  if (!customKey) return null;
+
+  return { key: customKey, titleRu: rawValue, isCustom: true };
 };
 
 const formatDraftLine = (draft) => {
@@ -259,7 +279,7 @@ const handleCommand = async ({ chatId, userId, text, state, stateSha }) => {
     await sendTelegramMessage(
       CONFIG.telegramBotToken,
       chatId,
-      'Админ-бот меню готов. Команды:\n/new - создать черновик\n/drafts - список черновиков\n<code>/publish ID</code> - опубликовать\n/cancel - отменить текущий ввод',
+      'Админ-бот меню готов. Команды:\n/new - создать черновик\n/drafts - список черновиков\n<code>/publish ID</code> - опубликовать\n/cancel - отменить текущий ввод\n\nНа шаге раздела можно ввести новый раздел текстом.',
       { reply_markup: MAIN_KEYBOARD }
     );
     return stateSha;
@@ -468,7 +488,7 @@ const handleSessionStep = async ({ chatId, userId, message, state, stateSha }) =
     await sendTelegramMessage(
       CONFIG.telegramBotToken,
       chatId,
-      'Шаг 5/5: выберите раздел (кнопкой или текстом ключа: coffee/breakfast/serving/news/decaf/bakery/dessert).',
+      'Шаг 5/5: выберите раздел кнопкой или введите новый текстом (например: Сезонные напитки).',
       { reply_markup: SECTION_KEYBOARD }
     );
 
@@ -476,9 +496,9 @@ const handleSessionStep = async ({ chatId, userId, message, state, stateSha }) =
   }
 
   if (session.step === 'await_section') {
-    const chosen = detectSection(message.text);
+    const chosen = resolveSection(message.text);
     if (!chosen) {
-      await sendTelegramMessage(CONFIG.telegramBotToken, chatId, 'Раздел не распознан. Выберите кнопкой или отправьте ключ категории.', {
+      await sendTelegramMessage(CONFIG.telegramBotToken, chatId, 'Раздел не распознан. Выберите кнопку или введите название нового раздела.', {
         reply_markup: SECTION_KEYBOARD,
       });
       return stateSha;

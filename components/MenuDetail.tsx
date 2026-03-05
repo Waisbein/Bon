@@ -34,16 +34,6 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang, initialCategory = 
     nothingFound: lang === 'ru' ? 'Ничего не найдено' : 'Hech narsa topilmadi'
   };
 
-  const categories = [
-    { id: 'coffee', name: t.coffee },
-    { id: 'breakfast', name: t.breakfast },
-    { id: 'serving', name: t.serving },
-    { id: 'news', name: t.news },
-    { id: 'decaf', name: t.decaf },
-    { id: 'bakery', name: t.bakery },
-    { id: 'dessert', name: t.dessert },
-  ];
-
   useEffect(() => {
     let isMounted = true;
 
@@ -75,6 +65,38 @@ export const MenuDetail: React.FC<MenuDetailProps> = ({ lang, initialCategory = 
   const allMenuItems = useMemo(() => {
     return [...menuItems, ...adminItems];
   }, [adminItems]);
+
+  const baseCategories = useMemo(() => {
+    return [
+      { id: 'coffee', name: t.coffee },
+      { id: 'breakfast', name: t.breakfast },
+      { id: 'serving', name: t.serving },
+      { id: 'news', name: t.news },
+      { id: 'decaf', name: t.decaf },
+      { id: 'bakery', name: t.bakery },
+      { id: 'dessert', name: t.dessert },
+    ];
+  }, [t.bakery, t.breakfast, t.coffee, t.decaf, t.dessert, t.news, t.serving]);
+
+  const categories = useMemo(() => {
+    const categoryMap = new Map<string, string>();
+    baseCategories.forEach((category) => categoryMap.set(category.id, category.name));
+
+    allMenuItems.forEach((item) => {
+      if (!categoryMap.has(item.category)) {
+        const sectionTitle = item.section?.trim();
+        categoryMap.set(item.category, sectionTitle || item.category);
+      }
+    });
+
+    return Array.from(categoryMap.entries()).map(([id, name]) => ({ id, name }));
+  }, [allMenuItems, baseCategories]);
+
+  useEffect(() => {
+    if (!categories.some((category) => category.id === activeCategory) && categories[0]) {
+      setActiveCategory(categories[0].id);
+    }
+  }, [activeCategory, categories]);
 
   const filteredItems = allMenuItems.filter(item => {
     const query = searchQuery.toLowerCase().trim();
