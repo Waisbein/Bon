@@ -63,7 +63,7 @@ Example:
 - `/publish <id>` - publish selected draft to live menu
 - `/cancel` - cancel active flow
 
-At step 5 you can either pick an existing section from keyboard or type a brand-new section name.
+At step 5 the keyboard includes existing sections (including custom ones you created earlier), or you can type a brand-new section name.
 The bot also auto-merges likely typo variants of existing section names to reduce duplicates.
 
 On publish, Vercel autodeploy will update the menu automatically.

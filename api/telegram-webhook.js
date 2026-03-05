@@ -32,15 +32,12 @@ const MAIN_KEYBOARD = {
   resize_keyboard: true,
 };
 
-const SECTION_KEYBOARD = {
-  keyboard: [
-    [{ text: 'Кофе' }, { text: 'Завтраки' }],
-    [{ text: 'Новая подача' }, { text: 'Новинки' }],
-    [{ text: 'Без кофеина' }, { text: 'Выпечка' }],
-    [{ text: 'Десерты' }],
-  ],
-  resize_keyboard: true,
-  one_time_keyboard: true,
+const chunk = (items, size) => {
+  const result = [];
+  for (let index = 0; index < items.length; index += size) {
+    result.push(items.slice(index, index + size));
+  }
+  return result;
 };
 
 const toNumber = (value) => {
@@ -130,6 +127,31 @@ const getKnownSections = async (state) => {
   }
 
   return Array.from(knownByKey.values());
+};
+
+const buildSectionKeyboard = (knownSections) => {
+  const sectionByKey = new Map(knownSections.map((section) => [section.key, section]));
+
+  const orderedBuiltins = SECTION_OPTIONS.map((option) => sectionByKey.get(option.key)).filter(Boolean);
+
+  const customSections = knownSections
+    .filter((section) => !BUILTIN_SECTION_KEYS.has(section.key))
+    .sort((left, right) => canonicalizeSectionTitle(left.titleRu).localeCompare(canonicalizeSectionTitle(right.titleRu), 'ru'));
+
+  const uniqueByTitle = new Map();
+  [...orderedBuiltins, ...customSections].forEach((section) => {
+    const titleKey = canonicalizeSectionTitle(section.titleRu);
+    if (!titleKey || uniqueByTitle.has(titleKey)) return;
+    uniqueByTitle.set(titleKey, section.titleRu);
+  });
+
+  const buttons = Array.from(uniqueByTitle.values()).slice(0, 24).map((title) => ({ text: title }));
+
+  return {
+    keyboard: chunk(buttons, 2),
+    resize_keyboard: true,
+    one_time_keyboard: true,
+  };
 };
 
 const levenshteinDistance = (left, right) => {
@@ -529,12 +551,13 @@ const handleSessionStep = async ({ chatId, userId, message, state, stateSha }) =
     session.step = 'await_section';
 
     const nextSha = await saveState(state, stateSha, `chore(bot): save description for ${session.draft.id}`);
+    const knownSections = await getKnownSections(state);
 
     await sendTelegramMessage(
       CONFIG.telegramBotToken,
       chatId,
       'Шаг 5/5: выберите раздел кнопкой или введите новый текстом (например: Сезонные напитки).',
-      { reply_markup: SECTION_KEYBOARD }
+      { reply_markup: buildSectionKeyboard(knownSections) }
     );
 
     return nextSha;
@@ -545,7 +568,7 @@ const handleSessionStep = async ({ chatId, userId, message, state, stateSha }) =
     const chosen = resolveSection(message.text, knownSections);
     if (!chosen) {
       await sendTelegramMessage(CONFIG.telegramBotToken, chatId, 'Раздел не распознан. Выберите кнопку или введите название нового раздела.', {
-        reply_markup: SECTION_KEYBOARD,
+        reply_markup: buildSectionKeyboard(knownSections),
       });
       return stateSha;
     }
