@@ -1,13 +1,14 @@
 {
   "sessions": {
     "467914417": {
-      "step": "await_name",
+      "step": "await_price",
       "draft": {
         "id": "d-1772721186307-2058",
         "createdAt": "2026-03-05T14:33:06.307Z",
         "createdBy": 467914417,
         "status": "draft",
-        "photoFileId": "AgACAgIAAxkBAAMmaamTPf6UBvHEbiuVBbJlvdvaiTMAAkQZaxsnUVBJahgFIfAoaXIBAAMCAANtAAM6BA"
+        "photoFileId": "AgACAgIAAxkBAAMmaamTPf6UBvHEbiuVBbJlvdvaiTMAAkQZaxsnUVBJahgFIfAoaXIBAAMCAANtAAM6BA",
+        "nameRu": "Салат Цезарь"
       }
     }
   },
