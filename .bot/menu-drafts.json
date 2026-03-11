@@ -1,7 +1,7 @@
 {
   "sessions": {
     "467914417": {
-      "step": "await_description",
+      "step": "await_section",
       "draft": {
         "id": "d-1773226527193-6713",
         "createdAt": "2026-03-11T10:55:27.193Z",
@@ -9,7 +9,8 @@
         "status": "draft",
         "photoFileId": "AgACAgIAAxkBAANWabFKJzO0GNA1_ryC_CJF_Ul8TaMAAhQnaxtJrIFJSKM3k83GzSsBAAMCAAN3AAM6BA",
         "nameRu": "Пудинг домашний",
-        "price": 100000
+        "price": 100000,
+        "descriptionRu": "Все, что было в холодильнике и Чиа"
       }
     }
   },
