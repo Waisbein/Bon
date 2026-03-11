@@ -43,5 +43,20 @@
     "category": "custom-D181D0B0D0BBD0B0D182D18B",
     "section": "Салаты",
     "image": "/menu/uploads/d-1772721402654-1695.jpg"
+  },
+  {
+    "id": "admin-d-1773226527193-6713",
+    "name": {
+      "ru": "Пудинг домашний",
+      "uz": "Пудинг домашний"
+    },
+    "longDescription": {
+      "ru": "Все, что было в холодильнике и Чиа",
+      "uz": "Все, что было в холодильнике и Чиа"
+    },
+    "price": 100000,
+    "category": "custom-D0B4D0BED0BCD0B0D188D0BDD0B5D0B520D182D0B2D0BED1",
+    "section": "Домашнее творчество",
+    "image": "/menu/uploads/d-1773226527193-6713.jpg"
   }
 ]
