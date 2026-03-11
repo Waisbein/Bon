@@ -1,19 +1,5 @@
 {
-  "sessions": {
-    "467914417": {
-      "step": "await_section",
-      "draft": {
-        "id": "d-1773226527193-6713",
-        "createdAt": "2026-03-11T10:55:27.193Z",
-        "createdBy": 467914417,
-        "status": "draft",
-        "photoFileId": "AgACAgIAAxkBAANWabFKJzO0GNA1_ryC_CJF_Ul8TaMAAhQnaxtJrIFJSKM3k83GzSsBAAMCAAN3AAM6BA",
-        "nameRu": "Пудинг домашний",
-        "price": 100000,
-        "descriptionRu": "Все, что было в холодильнике и Чиа"
-      }
-    }
-  },
+  "sessions": {},
   "drafts": [
     {
       "id": "d-1772720181096-2030",
@@ -75,6 +61,19 @@
       "publishedAt": "2026-03-05T14:40:57.988Z",
       "publishedMenuItemId": "admin-d-1772721402654-1695",
       "image": "/menu/uploads/d-1772721402654-1695.jpg"
+    },
+    {
+      "id": "d-1773226527193-6713",
+      "createdAt": "2026-03-11T10:55:27.193Z",
+      "createdBy": 467914417,
+      "status": "draft",
+      "photoFileId": "AgACAgIAAxkBAANWabFKJzO0GNA1_ryC_CJF_Ul8TaMAAhQnaxtJrIFJSKM3k83GzSsBAAMCAAN3AAM6BA",
+      "nameRu": "Пудинг домашний",
+      "price": 100000,
+      "descriptionRu": "Все, что было в холодильнике и Чиа",
+      "category": "custom-D0B4D0BED0BCD0B0D188D0BDD0B5D0B520D182D0B2D0BED1",
+      "sectionTitle": "Домашнее творчество",
+      "updatedAt": "2026-03-11T10:56:34.545Z"
     }
   ]
 }
