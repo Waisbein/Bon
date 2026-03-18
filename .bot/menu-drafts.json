@@ -1,7 +1,7 @@
 {
   "sessions": {
     "467914417": {
-      "step": "await_description",
+      "step": "await_section",
       "draft": {
         "id": "d-1773820605693-7049",
         "createdAt": "2026-03-18T07:56:45.693Z",
@@ -9,7 +9,8 @@
         "status": "draft",
         "photoFileId": "AgACAgIAAxkBAANlabpax_fNPvjlA5jLN6Yp5uCF9ZsAAoAVaxuu1thJNwuxkIdhgDABAAMCAAN4AAM6BA",
         "nameRu": "Докторская колбаса",
-        "price": 50000
+        "price": 50000,
+        "descriptionRu": "Мясо, бумага и специи"
       }
     }
   },
