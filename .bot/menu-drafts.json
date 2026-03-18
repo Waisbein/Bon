@@ -82,14 +82,17 @@
       "id": "d-1773820605693-7049",
       "createdAt": "2026-03-18T07:56:45.693Z",
       "createdBy": 467914417,
-      "status": "draft",
+      "status": "published",
       "photoFileId": "AgACAgIAAxkBAANlabpax_fNPvjlA5jLN6Yp5uCF9ZsAAoAVaxuu1thJNwuxkIdhgDABAAMCAAN4AAM6BA",
       "nameRu": "Докторская колбаса",
       "price": 50000,
       "descriptionRu": "Мясо, бумага и специи",
       "category": "custom-D0BAD0BED0BBD0B1D0B0D181D0BDD0BE20D0B1D183D0BCD0",
       "sectionTitle": "Колбасно бумажные изделия",
-      "updatedAt": "2026-03-18T07:57:48.328Z"
+      "updatedAt": "2026-03-18T07:57:48.328Z",
+      "publishedAt": "2026-03-18T07:57:57.597Z",
+      "publishedMenuItemId": "admin-d-1773820605693-7049",
+      "image": "/menu/uploads/d-1773820605693-7049.jpg"
     }
   ]
 }
