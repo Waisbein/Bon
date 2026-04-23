@@ -185,7 +185,6 @@ const App: React.FC = () => {
       storyDesc: 'Скидка -50% на всю выпечку после 20:00'
     },
     uz: { 
-      slogan: 'Har bir qultum va yangi pishiriq bo\'lagida haqiqiy rohat', 
       menu: 'Menyu', 
       branches: 'Filiallar',
       promotions: 'Aksiyalar',
@@ -323,9 +322,6 @@ const App: React.FC = () => {
             
             <div className="flex-1 flex flex-col items-center justify-center space-y-10">
               <Logo className="w-48 drop-shadow-xl" />
-              <p className="text-center font-serif text-[#3d2721] dark:text-[#b8866b] text-xl px-4 leading-relaxed tracking-wide opacity-90">
-                {t.slogan}
-              </p>
             </div>
             
             <div className="w-full max-w-[320px] mx-auto space-y-4 mb-2">

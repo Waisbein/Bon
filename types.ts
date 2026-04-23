@@ -1,6 +1,5 @@
 
 export type Language = 'ru' | 'uz';
-export type MenuCategory = 'coffee' | 'bakery' | 'breakfast' | 'dessert' | 'decaf' | 'news' | 'serving' | (string & {});
 
 export interface MenuItem {
   id: string;
@@ -10,7 +9,7 @@ export interface MenuItem {
   allergens?: { ru: string; uz: string }; // Аллергены
   volumes?: { [size: string]: string }; // Объемы (напр. Petit: 200мл)
   price: number | { [size: string]: number };
-  category: MenuCategory;
+  category: 'coffee' | 'bakery' | 'breakfast' | 'dessert' | 'decaf' | 'news' | 'serving';
   section?: string; // Поле для специфического именования раздела
   image: string;
 }
