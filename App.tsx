@@ -176,7 +176,6 @@ const App: React.FC = () => {
 
   const translations = {
     ru: { 
-      slogan: 'Истинное удовольствие в каждом глотке и кусочке свежей выпечки', 
       menu: 'Меню', 
       branches: 'Филиалы',
       promotions: 'Акции',
@@ -323,7 +322,10 @@ const App: React.FC = () => {
           <div className="min-h-screen flex flex-col justify-between p-8 bg-gradient-to-b from-[#faf9f6] to-white dark:from-[#121212] dark:to-[#1a1a1a] animate-fadeIn">
             
             <div className="flex-1 flex flex-col items-center justify-center space-y-10">
-              
+              <Logo className="w-48 drop-shadow-xl" />
+              <p className="text-center font-serif text-[#3d2721] dark:text-[#b8866b] text-xl px-4 leading-relaxed tracking-wide opacity-90">
+                {t.slogan}
+              </p>
             </div>
             
             <div className="w-full max-w-[320px] mx-auto space-y-4 mb-2">
